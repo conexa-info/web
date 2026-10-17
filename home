@@ -600,7 +600,7 @@
                 });
             }
 
-            const message = `Estimado equipo de CONEXA,%0A%0AMi nombre es *${contact}*, representante de *${brand}*.%0A%0ANos contactamos a través de su sitio web para evaluar la siguiente propuesta comercial:%0A- *Modalidad de interés:* ${type}%0A- *Detalles de la iniciativa:* ${details}%0A%0AQuedamos a disposición para coordinar una reunión inicial.%0A%0ASaludos cordiales.`;
+            const message = `Estimado equipo de Conexa,%0A%0Ami nombre es *${contact}*, representante de *${brand}*.%0A%0ANos contactamos a través de su sitio web para evaluar la siguiente propuesta comercial:%0A- *Modalidad de interés:* ${type}%0A- *Detalles de la iniciativa:* ${details}%0A%0AQuedamos a disposición para coordinar una reunión inicial.%0A%0ASaludos cordiales.`;
             const phone = "5491154714007";
             window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
         }
