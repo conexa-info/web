@@ -36,6 +36,8 @@ gtag('js',new Date());gtag('config','G-2Y125WBRR4');
  .navlink{@apply block px-4 py-3 md:py-1.5 rounded-full text-gray-300 hover:text-white border border-transparent hover:border-neon/40 transition whitespace-nowrap text-sm font-medium}
  .navlink[aria-current=page]{@apply text-white font-bold bg-neon/40 border-neon}
  .bar{@apply w-full bg-black/60 h-2.5 rounded-full overflow-hidden border border-white/10}
+ .ddi{@apply flex items-center gap-3 p-3 rounded-xl hover:bg-neon/20 transition text-left w-full}
+ .ddi[aria-current=page]{@apply bg-neon/30}
 }
 </style>
 <style>
@@ -46,6 +48,13 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 h1,h2,h3,h4{font-family:'Syne',sans-serif}
 .glow{text-shadow:0 0 20px rgb(40 15 194/.9),0 0 40px rgb(40 15 194/.5)}
 :focus-visible{outline:2px solid #8b7bff;outline-offset:2px}
+/* Desplegable de influencers */
+.ddp{display:none}
+.dd.open .ddp{display:block}
+@media (min-width:768px){
+ .ddp{position:absolute;top:100%;left:50%;transform:translateX(-50%);width:16rem;padding-top:.5rem}
+ .dd:hover .ddp,.dd:focus-within .ddp{display:block}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important;transition:none!important}}
 </style>
 </head>
@@ -55,10 +64,29 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif}
  <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 md:h-20 flex items-center justify-between gap-3">
   <a href="#inicio" class="text-2xl sm:text-3xl font-extrabold tracking-tighter text-white font-syne">CONEXA<span class="text-neon">.</span></a>
   <button id="burger" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu" class="md:hidden size-12 grid place-items-center rounded-xl border border-white/20 text-white"><i class="fa-solid fa-bars text-lg"></i></button>
-  <nav id="menu" aria-label="Principal" class="hidden md:flex flex-col md:flex-row absolute md:static top-full inset-x-0 bg-[#030207] md:bg-transparent p-4 md:p-0 border-b md:border-0 border-white/10 gap-1 md:gap-2">
+  <nav id="menu" aria-label="Principal" class="hidden md:flex flex-col md:flex-row absolute md:static top-full inset-x-0 bg-[#030207] md:bg-transparent p-4 md:p-0 border-b md:border-0 border-white/10 gap-1 md:gap-2 md:items-center">
    <a class="navlink" data-tab="inicio" href="#inicio">Inicio</a>
    <a class="navlink" data-tab="nosotros" href="#nosotros">Quiénes somos</a>
-   <a class="navlink" data-tab="influencers" href="#influencers">Nuestros influencers</a>
+
+   <!-- DESPLEGABLE: NUESTROS INFLUENCERS -->
+   <div class="dd relative" id="dd">
+    <button type="button" id="ddBtn" class="navlink w-full flex items-center justify-between gap-2" data-tab="spiky felbuck" aria-expanded="false" aria-haspopup="true" aria-controls="ddMenu">
+     Nuestros influencers <i class="fa-solid fa-chevron-down text-xs" aria-hidden="true"></i>
+    </button>
+    <div class="ddp" id="ddMenu">
+     <div class="glass rounded-2xl p-2 flex flex-col gap-1 !bg-black/95">
+      <a class="ddi" data-tab="spiky" href="#spiky">
+       <span class="size-10 rounded-full bg-black border border-neon/60 grid place-items-center text-white font-bold text-xs shrink-0">S</span>
+       <span><span class="block text-white text-sm font-bold">Spiky</span><span class="block text-gray-400 text-xs">+460K comunidad total</span></span>
+      </a>
+      <a class="ddi" data-tab="felbuck" href="#felbuck">
+       <span class="size-10 rounded-full bg-black border border-neon/60 grid place-items-center text-white font-bold text-xs shrink-0">F</span>
+       <span><span class="block text-white text-sm font-bold">FelBuck_</span><span class="block text-gray-400 text-xs">+205K comunidad total</span></span>
+      </a>
+     </div>
+    </div>
+   </div>
+
    <a class="navlink" data-tab="creadores" href="#creadores">Sumate como creador</a>
    <a class="navlink" data-tab="contacto" href="#contacto">Contacto</a>
    <a class="btn md:hidden mt-2" href="#propuesta">Solicitar propuesta</a>
@@ -155,20 +183,20 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif}
       <span class="size-24 rounded-full bg-neon/30 border-2 border-neon grid place-items-center mx-auto mb-5 text-3xl font-extrabold font-syne text-white relative overflow-hidden">S<img src="assets/san.png" alt="Foto de Santino" width="96" height="96" loading="lazy" onerror="this.remove()" class="absolute inset-0 size-full object-cover"></span>
       <h3 class="text-2xl font-bold text-white">Santino</h3>
       <p class="text-neon text-sm font-semibold mt-1 mb-4">Fundador · Área comercial</p>
-      <p class="text-gray-300 text-sm leading-relaxed">Lidera el desarrollo comercial: detecta oportunidades, negocia con marcas y comercios y gestiona cada acuerdo. <br> <a href="https://www.linkedin.com/in/santino-gioveni" class="text-white underline underline-offset-4 hover:text-neon">Conoce más</a></p>
+      <p class="text-gray-300 text-sm leading-relaxed">Lidera el desarrollo comercial, conecta con marcas y comercios, identifica nuevas oportunidades de negocio y genera alianzas estratégicas para generar colaboraciones que impulsen el crecimiento de la agencia. <br> <a href="https://www.linkedin.com/in/santino-gioveni" class="text-white underline underline-offset-4 hover:text-neon">Conoce más</a></p>
      </article>
      <article class="glass p-8 rounded-3xl text-center border-t-4 !border-t-neon">
-      <span class="size-24 rounded-full bg-neon/30 border-2 border-neon grid place-items-center mx-auto mb-5 text-3xl font-extrabold font-syne text-white relative overflow-hidden">S<img src="assets/spikiii.png" alt="Foto de Spiky" width="96" height="96" loading="lazy" onerror="this.remove()" class="absolute inset-0 size-full object-cover"></span>
+      <span class="size-24 rounded-full bg-neon/30 border-2 border-neon grid place-items-center mx-auto mb-5 text-3xl font-extrabold font-syne text-white relative overflow-hidden">S<img src="assets/spiky.png" alt="Foto de Spiky" width="96" height="96" loading="lazy" onerror="this.remove()" class="absolute inset-0 size-full object-cover"></span>
       <h3 class="text-2xl font-bold text-white">Spiky</h3>
       <p class="text-neon text-sm font-semibold mt-1 mb-4">Socio · Co-Founder</p>
-      <p class="text-gray-300 text-sm leading-relaxed">Creador principal de la agencia. Aporta su audiencia y su experiencia en contenido corto. <a href="#influencers" class="text-white underline underline-offset-4 hover:text-neon">Conoce más</a></p>
+      <p class="text-gray-300 text-sm leading-relaxed">Aporta su audiencia y experiencia en contenido corto, desarrollando estrategias creativas que conectan con el público, potencian la visibilidad de las marcas y generan resultados reales en redes. <br> <a href="#spiky" class="text-white underline underline-offset-4 hover:text-neon">Conoce más</a></p>
      </article>
      <article class="glass p-8 rounded-3xl text-center border-t-4 !border-t-neon">
       <span class="size-24 rounded-full bg-neon/30 border-2 border-neon grid place-items-center mx-auto mb-5 text-3xl font-extrabold font-syne text-white relative overflow-hidden">E<img src="assets/emilia.png" alt="Foto de Emilia" width="96" height="96" loading="lazy" onerror="this.remove()" class="absolute inset-0 size-full object-cover"></span>
       <h3 class="text-2xl font-bold text-white">Emilia</h3>
       <p class="text-neon text-sm font-semibold mt-1 mb-4">Área estratégica de Marketing</p>
-      <p class="text-gray-300 text-sm leading-relaxed">Diseña la estrategia de cada campaña: define objetivos, mensajes y formatos para que el contenido genere resultados. <br> <a href="https://emidonzabidini.github.io/portfolio/" class="text-white underline underline-offset-4 hover:text-neon">Conoce más</a></p>     
-      </article>
+      <p class="text-gray-300 text-sm leading-relaxed">Diseña la estrategia de cada campaña, definiendo objetivos, mensajes y formatos para crear contenido relevante, conectar con las audiencias y maximizar los resultados de cada marca. <br> <a href="https://emidonzabidini.github.io/portfolio/" class="text-white underline underline-offset-4 hover:text-neon">Conoce más</a></p>
+     </article>
     </div>
    </div>
 
@@ -196,68 +224,9 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif}
  </section>
 </div>
 
-<!-- INFLUENCERS -->
-<div id="influencers" class="tab" hidden>
- <section class="pt-28 pb-16">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6">
-   <div class="glass p-6 sm:p-10 rounded-3xl mb-8 border-neon/60">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-     <div class="flex flex-col sm:flex-row sm:items-center gap-6">
-      <div class="relative shrink-0">
-       <img src="https://lh3.googleusercontent.com/d/17Xc5zx7aa3X2Xe0YCXoVpd8PLKItqumk" alt="Spiky" width="128" height="128" loading="lazy" referrerpolicy="no-referrer" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 fill=%27%23280FC2%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2755%27 font-weight=%27800%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27%3ES%3C/text%3E%3C/svg%3E'" class="size-24 sm:size-32 rounded-full object-cover border-2 border-neon shadow-lg shadow-neon/30">
-       <span class="absolute bottom-1 right-1 size-4 rounded-full bg-emerald-500 border-2 border-black" title="Activo"></span>
-      </div>
-      <div>
-       <span class="inline-block bg-neon/30 border border-neon/70 px-3 py-1 rounded-full text-xs font-mono mb-3">Creador de contenido</span>
-       <h1 class="text-4xl sm:text-6xl font-extrabold text-white tracking-tight">Spiky</h1>
-       <p class="text-gray-300 mt-2 max-w-xl">Creador de formato corto, humor urbano y tendencias masivas. Métricas reales de alcance e interacción.</p>
-       <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4 pt-4 border-t border-white/10">
-        <a href="https://www.tiktok.com/@Spikiii" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition flex items-center gap-2 text-sm font-semibold py-1"><i class="fa-brands fa-tiktok text-neon"></i>TikTok @Spikiii</a>
-        <a href="https://www.instagram.com/juanilecot/" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition flex items-center gap-2 text-sm font-semibold py-1"><i class="fa-brands fa-instagram text-neon"></i>Instagram @juanilecot</a>
-       </div>
-      </div>
-     </div>
-     <a data-wa href="#" target="_blank" rel="noopener noreferrer" class="btn shrink-0">Consultar disponibilidad</a>
-    </div>
-   </div>
-
-   <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-    <div class="glass p-5 sm:p-6 rounded-2xl"><span class="text-gray-400 text-xs">Seguidores totales</span><div class="text-3xl sm:text-4xl font-extrabold text-white mt-2 font-syne">+386.000</div><span class="text-neon text-xs mt-1 block font-semibold">Audiencia activa</span></div>
-    <div class="glass p-5 sm:p-6 rounded-2xl border-neon/80"><span class="text-gray-400 text-xs">Mediana de vistas</span><div class="text-3xl sm:text-4xl font-extrabold text-neon mt-2 font-syne">~2,0 M</div><span class="text-gray-300 text-xs mt-1 block">Rango base: 700 K+</span></div>
-    <div class="glass p-5 sm:p-6 rounded-2xl"><span class="text-gray-400 text-xs">Pico viral máximo</span><div class="text-3xl sm:text-4xl font-extrabold text-white mt-2 font-syne">18,6 M</div><span class="text-gray-300 text-xs mt-1 block">Alcance orgánico máximo</span></div>
-    <div class="glass p-5 sm:p-6 rounded-2xl"><span class="text-gray-400 text-xs">Consistencia</span><div class="text-3xl sm:text-4xl font-extrabold text-white mt-2 font-syne">+9</div><span class="text-gray-300 text-xs mt-1 block">Videos superan 1 millón</span></div>
-   </div>
-
-   <div class="grid lg:grid-cols-3 gap-8 glass p-6 sm:p-8 rounded-3xl">
-    <div>
-     <h3 class="text-lg font-bold mb-4 text-neon"><i class="fa-solid fa-chart-pie mr-2"></i>Rango etario</h3>
-     <div class="space-y-4">
-      <div><div class="flex justify-between text-sm mb-1"><span>18 - 24 años</span><b>35,3%</b></div><div class="bar"><div class="bg-neon h-full" style="width:35.3%"></div></div></div>
-      <div><div class="flex justify-between text-sm mb-1"><span>25 - 34 años</span><b>44,7%</b></div><div class="bar"><div class="bg-neon h-full" style="width:44.7%"></div></div></div>
-      <p class="text-xs text-gray-400 pt-2">80% de la audiencia es joven y adulta, con capacidad de consumo.</p>
-     </div>
-    </div>
-    <div>
-     <h3 class="text-lg font-bold mb-4 text-neon"><i class="fa-solid fa-venus-mars mr-2"></i>Distribución de género</h3>
-     <div class="space-y-4">
-      <div><div class="flex justify-between text-sm mb-1"><span>Hombres</span><b>72%</b></div><div class="bar"><div class="bg-blue-600 h-full" style="width:72%"></div></div></div>
-      <div><div class="flex justify-between text-sm mb-1"><span>Mujeres</span><b>27%</b></div><div class="bar"><div class="bg-pink-500 h-full" style="width:27%"></div></div></div>
-      <p class="text-xs text-gray-400 pt-2">Ideal para gastronomía, moda urbana, tecnología y entretenimiento.</p>
-     </div>
-    </div>
-    <div>
-     <h3 class="text-lg font-bold mb-4 text-neon"><i class="fa-solid fa-earth-americas mr-2"></i>Audiencia por país</h3>
-     <ul class="space-y-3 text-sm text-gray-300">
-      <li class="flex justify-between border-b border-white/10 pb-2"><span>Argentina</span><b class="text-white">53,5%</b></li>
-      <li class="flex justify-between border-b border-white/10 pb-2"><span>España</span><b class="text-white">8,5%</b></li>
-      <li class="flex justify-between border-b border-white/10 pb-2"><span>México</span><b class="text-white">7,3%</b></li>
-      <li class="flex justify-between"><span>Chile / Uruguay</span><b class="text-white">11,0%</b></li>
-     </ul>
-    </div>
-   </div>
-  </div>
- </section>
-</div>
+<!-- INFLUENCERS: cada perfil se genera desde los datos del script (ver INFLUENCERS más abajo) -->
+<div id="spiky" class="tab" hidden></div>
+<div id="felbuck" class="tab" hidden></div>
 
 <!-- CREADORES -->
 <div id="creadores" class="tab" hidden>
@@ -343,25 +312,102 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif}
 const PHONE="5491154714007";
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const wa=t=>`https://wa.me/${PHONE}?text=${encodeURIComponent(t)}`;
-const menu=$('#menu'),burger=$('#burger');
+const menu=$('#menu'),burger=$('#burger'),dd=$('#dd'),ddBtn=$('#ddBtn');
 
+/* ============ DATOS DE INFLUENCERS ============ */
+const INFLUENCERS={
+ spiky:{
+  name:'Spiky',initials:'S',
+  img:'/assets/spiky.png',
+  bio:'Creador en formato corto, humor urbano y tendencias masivas. Métricas de alcance e interacción real.',
+  tiktok:{url:'https://www.tiktok.com/@Spikiiiii'},
+  instagram:{url:'https://www.instagram.com/juanilecot'},
+  stats:[
+   {l:'Audiencia acumulada',v:'+460.000',s:'TikTok + Instagram',sc:'text-neon font-semibold'},
+   {l:'Vistas mensuales (TikTok)',v:'26.4M',s:'14.1M espectadores únicos',sc:'text-emerald-400',hl:1},
+   {l:'Vistas mensuales (Instagram)',v:'8.5M',s:'8.2M no seguidores',sc:'text-gray-300'},
+   {l:'Engagement mensual',v:'2.4M+',s:'Me gusta en TikTok',sc:'text-gray-300'}],
+  age:[['25 - 34 años',44.7],['18 - 24 años',35.2],['35 - 44 años',11.8]],
+  ageNote:'El 79,9% de su audiencia en TikTok tiene entre 18 y 34 años.',
+  gender:[['Hombres',72,'bg-blue-600'],['Mujeres',27,'bg-pink-500']],
+  countries:[['Argentina',42.7],['México',9.9],['Chile',4.2],['Perú',4.2],['Colombia',4.1]]
+ },
+ felbuck:{
+  name:'FelBuck_',initials:'F',img: '/assets/felbuck.png',
+  bio:'Creador de contenido de entretenimiento, experimentos sociales y formato corto con alto engagement.',
+  tiktok:{url:'https://www.tiktok.com/@felbuck'},
+  instagram:{url:'https://www.instagram.com/felbuck_/'},
+  stats:[
+   {l:'Audiencia acumulada',v:'+205.000',s:'TikTok + Instagram',sc:'text-neon font-semibold'},
+   {l:'Vistas mensuales (TikTok)',v:'9.6M',s:'+24.7% este mes',sc:'text-emerald-400',hl:1},
+   {l:'Vistas mensuales (Instagram)',v:'11.7M',s:'Principalmente en Reels',sc:'text-gray-300'},
+   {l:'Engagement mensual',v:'692K+',s:'Me gusta en TikTok',sc:'text-gray-300'}],
+  age:[['18 - 24 años',41.7],['25 - 34 años',38.4],['35 - 44 años',10.4]],
+  ageNote:'El 80,1% de su audiencia en TikTok tiene entre 18 y 34 años.',
+  gender:[['Mujeres',49,'bg-pink-500'],['Hombres',48,'bg-blue-600']],
+  genderNote:'Equilibrio casi 50/50 que permite conectar con campañas mixtas de consumo masivo.',
+  countries:[['Argentina',55.3],['España',7.2],['México',6.8],['Perú',4.2],['Chile',3.4]]
+ }
+};
+
+const fmt=n=>String(n).replace('.',',')+'%';
+const bar=([l,v,c])=>`<div><div class="flex justify-between text-sm mb-1"><span>${l}</span><b class="text-white">${fmt(v)}</b></div><div class="bar"><div class="${c||'bg-neon'} h-full" style="width:${v}%"></div></div></div>`;
+
+function profile(id,p){
+  const avatar=`<span class="size-24 sm:size-32 rounded-full border-2 border-neon bg-black/60 grid place-items-center text-4xl text-neon font-bold font-syne relative overflow-hidden shadow-lg shadow-neon/30">${p.initials}${p.img?`<img src="${p.img}" alt="${p.name}" width="128" height="128" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()" class="absolute inset-0 size-full object-cover">`:''}</span>`;
+  const msg=`Estimados, contacto desde la web de CONEXA interesado en evaluar una propuesta comercial con ${p.name.replace('_','')}.`;
+  return `<section class="pt-28 pb-16"><div class="max-w-7xl mx-auto px-4 sm:px-6">
+  <div class="glass p-6 sm:p-10 rounded-3xl mb-8 border-neon/60"><div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+   <div class="flex flex-col sm:flex-row sm:items-center gap-6">
+    <div class="relative shrink-0">${avatar}<span class="absolute bottom-1 right-1 size-4 rounded-full bg-emerald-500 border-2 border-black" title="Activo"></span></div>
+    <div>
+     <span class="inline-block bg-neon/30 border border-neon/70 px-3 py-1 rounded-full text-xs font-mono mb-3">CREADOR DE CONTENIDO DIGITAL</span>
+     <h1 class="text-4xl sm:text-6xl font-extrabold text-white tracking-tight flex items-center gap-3">${p.name} <i class="fa-solid fa-circle-check text-blue-500 text-2xl sm:text-3xl" title="Verificado"></i></h1>
+     <p class="text-gray-300 mt-2 max-w-xl">${p.bio}</p>
+     <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4 pt-4 border-t border-white/10">
+      <a href="${p.tiktok.url}" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition flex items-center gap-2 text-sm font-semibold py-1"><i class="fa-brands fa-tiktok text-neon"></i>TikTok</a>
+      <a href="${p.instagram.url}" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition flex items-center gap-2 text-sm font-semibold py-1"><i class="fa-brands fa-instagram text-neon"></i>Instagram</a>
+     </div>
+    </div>
+   </div>
+   <a href="${wa(msg)}" target="_blank" rel="noopener noreferrer" data-lead="${id}" class="btn shrink-0">Consultar disponibilidad</a>
+  </div></div>
+
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+   ${p.stats.map(s=>`<div class="glass p-5 sm:p-6 rounded-2xl ${s.hl?'border-neon/80':''}"><span class="text-gray-400 text-xs">${s.l}</span><div class="text-3xl sm:text-4xl font-extrabold ${s.hl?'text-neon':'text-white'} mt-2 font-syne">${s.v}</div><span class="${s.sc} text-xs mt-1 block">${s.s}</span></div>`).join('')}
+  </div>
+
+  <div class="grid lg:grid-cols-3 gap-8 glass p-6 sm:p-8 rounded-3xl">
+   <div><h3 class="text-lg font-bold mb-4 text-neon"><i class="fa-solid fa-chart-pie mr-2"></i>Rango etario</h3><div class="space-y-4">${p.age.map(bar).join('')}<p class="text-xs text-gray-400 pt-2">${p.ageNote}</p></div></div>
+   <div><h3 class="text-lg font-bold mb-4 text-neon"><i class="fa-solid fa-venus-mars mr-2"></i>Distribución de género</h3><div class="space-y-4">${p.gender.map(bar).join('')}<p class="text-xs text-gray-400 pt-2"></p></div></div>
+   <div><h3 class="text-lg font-bold mb-4 text-neon"><i class="fa-solid fa-earth-americas mr-2"></i>Alcance por país</h3><ul class="space-y-3 text-sm text-gray-300">${p.countries.map(([n,v],i,a)=>`<li class="flex justify-between ${i<a.length-1?'border-b border-white/10 pb-2':''}"><span>${n}</span><b class="text-white">${fmt(v)}</b></li>`).join('')}</ul></div>
+  </div></div></section>`;
+}
+Object.entries(INFLUENCERS).forEach(([id,p])=>{$('#'+id).innerHTML=profile(id,p)});
+
+/* ============ MENÚ ============ */
+function setDD(open){dd.classList.toggle('open',open);ddBtn.setAttribute('aria-expanded',open)}
 function setMenu(open){
   menu.classList.toggle('hidden',!open);
   burger.setAttribute('aria-expanded',open);
   burger.querySelector('i').className='fa-solid text-lg '+(open?'fa-xmark':'fa-bars');
+  if(!open)setDD(false);
 }
 burger.addEventListener('click',()=>setMenu(menu.classList.contains('hidden')));
-document.addEventListener('keydown',e=>{if(e.key==='Escape')setMenu(false)});
+ddBtn.addEventListener('click',()=>setDD(!dd.classList.contains('open')));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){setMenu(false);setDD(false)}});
+document.addEventListener('click',e=>{if(!dd.contains(e.target))setDD(false)});
 
-/* Router por hash: #nosotros, #influencers, #propuesta... (el botón "atrás" funciona) */
+/* Router por hash: #nosotros, #spiky, #felbuck, #propuesta... */
 let current;
 function route(){
-  const id=decodeURIComponent(location.hash.slice(1))||'inicio';
+  let id=decodeURIComponent(location.hash.slice(1))||'inicio';
+  if(id==='influencers')id='spiky'; // compatibilidad con links viejos
   const el=document.getElementById(id)||$('#inicio');
   const tab=el.closest('.tab')||el;
   $$('.tab').forEach(t=>t.hidden=t!==tab);
-  $$('.navlink').forEach(a=>a.dataset.tab===tab.id?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current'));
-  setMenu(false);
+  $$('[data-tab]').forEach(a=>a.dataset.tab.split(' ').includes(tab.id)?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current'));
+  setMenu(false);setDD(false);
   if(el===tab||current!==tab.id){
     window.scrollTo(0,0);
     if(el!==tab)requestAnimationFrame(()=>el.scrollIntoView());
@@ -373,6 +419,7 @@ addEventListener('hashchange',route);
 route();
 
 $$('[data-wa]').forEach(a=>a.href=wa('Estimados, contacto desde la web de CONEXA interesado en evaluar una propuesta comercial.'));
+$$('[data-lead]').forEach(a=>a.addEventListener('click',()=>gtag('event','influencer_inquiry',{influencer:a.dataset.lead})));
 
 $('#campaignForm').addEventListener('submit',e=>{
   e.preventDefault();
