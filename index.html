@@ -333,7 +333,8 @@ const INFLUENCERS={
   age:[['25 - 34 años',44.7],['18 - 24 años',35.2],['35 - 44 años',11.8]],
   ageNote:'El 79,9% de su audiencia en TikTok tiene entre 18 y 34 años.',
   gender:[['Hombres',72,'bg-blue-600'],['Mujeres',27,'bg-pink-500']],
-  countries:[['Argentina',42.7],['México',9.9],['Chile',4.2],['Perú',4.2],['Colombia',4.1]]
+  countries:[['Argentina',42.7],['México',9.9],['Chile',4.2],['Perú',4.2],['Colombia',4.1]],
+  videos:['7613540217605197074','7572347426250575122']
  },
  felbuck:{
   name:'FelBuck_',initials:'F',img: '/assets/felbuck.png',
@@ -384,7 +385,9 @@ function profile(id,p){
    <div><h3 class="text-lg font-bold mb-4 text-neon"><i class="fa-solid fa-chart-pie mr-2"></i>Rango etario</h3><div class="space-y-4">${p.age.map(bar).join('')}<p class="text-xs text-gray-400 pt-2">${p.ageNote}</p></div></div>
    <div><h3 class="text-lg font-bold mb-4 text-neon"><i class="fa-solid fa-venus-mars mr-2"></i>Distribución de género</h3><div class="space-y-4">${p.gender.map(bar).join('')}<p class="text-xs text-gray-400 pt-2"></p></div></div>
    <div><h3 class="text-lg font-bold mb-4 text-neon"><i class="fa-solid fa-earth-americas mr-2"></i>Alcance por país</h3><ul class="space-y-3 text-sm text-gray-300">${p.countries.map(([n,v],i,a)=>`<li class="flex justify-between ${i<a.length-1?'border-b border-white/10 pb-2':''}"><span>${n}</span><b class="text-white">${fmt(v)}</b></li>`).join('')}</ul></div>
-  </div></div></section>`;
+    </div>
+  ${p.videos?`<div class="mt-12"><h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-6 text-center">COLABORACIONES <span class="text-neon glow">DESTACADAS</span></h2><div class="flex flex-wrap justify-center gap-6">${p.videos.map(id=>`<iframe src="https://www.tiktok.com/player/v1/${id}?music_info=1&description=1" title="Video de ${p.name} en TikTok" loading="lazy" allow="fullscreen" class="w-full max-w-[325px] aspect-[9/16] rounded-2xl border border-white/10"></iframe>`).join('')}</div></div>`:''}
+  </div></section>`;
 }
 Object.entries(INFLUENCERS).forEach(([id,p])=>{$('#'+id).innerHTML=profile(id,p)});
 
