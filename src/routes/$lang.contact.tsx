@@ -96,14 +96,6 @@ function Contact() {
           >
             <Linkedin className="h-4 w-4" /> {c.linkedin}
           </a>
-          <a
-            href={SOCIALS.founderLinkedIn}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 hover:text-primary"
-          >
-            <Linkedin className="h-4 w-4" /> {c.founder}
-          </a>
           <span>{c.response}</span>
         </div>
       </div>

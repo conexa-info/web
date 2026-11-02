@@ -204,7 +204,7 @@ const es = {
     teamTitle: "Las personas detrás de Conexa",
     team: [
       {
-        name: "Santino Gioveni",
+        name: "Santi",
         role: "Fundador · Área comercial",
         text: "Lidera el desarrollo comercial, conecta con marcas y comercios, identifica nuevas oportunidades de negocio y genera alianzas para impulsar colaboraciones.",
       },
@@ -214,7 +214,7 @@ const es = {
         text: "Aporta su audiencia y experiencia en contenido corto, desarrollando estrategias creativas que conectan con el público y potencian la visibilidad de las marcas.",
       },
       {
-        name: "Emilia",
+        name: "Emi",
         role: "Área estratégica de Marketing",
         text: "Diseña la estrategia de cada campaña, definiendo objetivos, mensajes y formatos para crear contenido relevante y conectar con las audiencias.",
       },
@@ -223,8 +223,8 @@ const es = {
     visionTitle: "Lo que estamos construyendo",
     vision:
       "Aspiramos a desarrollar una red sólida de oportunidades comerciales. No buscamos acuerdos aislados, sino un modelo replicable donde las relaciones evolucionen y aporten valor de forma continua.",
-    baseTitle: "Desde Buenos Aires hacia el mundo",
-    base: "Nuestra base está en Buenos Aires (CABA), Argentina. Trabajamos presencialmente con comercios, marcas y producciones en la ciudad, y nuestros creadores llegan a audiencias de distintos países.",
+    baseTitle: "Base en Buenos Aires, alcance global",
+    base: "Nacimos en Buenos Aires, donde trabajamos presencialmente con marcas, comercios y producciones. Desde acá representamos creadores de distintos países y unimos marcas y talentos de todo el mundo, sin importar dónde estén.",
   },
   how: {
     eyebrow: "Cómo trabajamos",
@@ -647,8 +647,8 @@ const en: Dict = {
     visionTitle: "What we're building",
     vision:
       "We aim to build a solid network of business opportunities. We're not after one-off deals, but a repeatable model where relationships evolve and keep adding value.",
-    baseTitle: "From Buenos Aires to the world",
-    base: "We're based in Buenos Aires (CABA), Argentina. We work in person with businesses, brands and productions in the city, and our creators reach audiences in different countries.",
+baseTitle: "Based in Buenos Aires, reaching the world",
+base: "We were born in Buenos Aires, where we work in person with brands, businesses and productions. From here we represent creators from different countries and bring together brands and talent from all over the world, wherever they are.",
   },
   how: {
     eyebrow: "How we work",
