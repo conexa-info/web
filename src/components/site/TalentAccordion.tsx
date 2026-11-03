@@ -76,7 +76,7 @@ export function TalentAccordion({ talents, lang }: { talents: Talent[]; lang: La
                       <TalentPhoto
                         talent={tal}
                         lang={lang}
-                        className={`grayscale transition-all duration-1000 hover:grayscale-0 ${isOpen ? "scale-100" : "scale-125"}`}
+                        className={`[@media(hover:hover)]:grayscale transition-all duration-1000 hover:grayscale-0 ${isOpen ? "scale-100" : "scale-125"}`}
                       />
                       <span className="vertical absolute bottom-4 left-3 font-display text-4xl text-primary">
                         {tal.handle}

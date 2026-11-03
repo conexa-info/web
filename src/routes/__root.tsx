@@ -80,12 +80,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     { charSet: "utf-8" },
     { name: "viewport", content: "width=device-width, initial-scale=1" },
     { name: "author", content: "CONEXA" },
-    { property: "og:image", content: "https://conexa-agency.com.ar/og.png" },
+    { property: "og:image", content: "https://www.conexa-agency.com.ar/og.png" },
     { property: "og:image:width", content: "1200" },
     { property: "og:image:height", content: "630" },
     { property: "og:site_name", content: "Conexa" },
     { name: "twitter:card", content: "summary_large_image" },
-    { name: "twitter:image", content: "https://conexa-agency.com.ar/og.png" },
+    { name: "twitter:image", content: "https://www.conexa-agency.com.ar/og.png" },
     ],  
     links: [
       {

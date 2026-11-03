@@ -12,7 +12,7 @@ import type { Lang } from "@/lib/i18n";
 
 // Single source of truth for creator profiles. Add a new object to TALENTS to
 // publish a new creator: the cards, profile page, forms and sitemap pick it up.
-
+ 
 type L = Record<Lang, string>;
 
 export interface Metric {
@@ -508,16 +508,16 @@ export const TALENTS: Talent[] = [
       "93% de su audiencia está en Italia; 94% habla italiano.",
       "93% of his audience is in Italy; 94% speaks Italian.",
     ),
-    socials: [{ platform: "Instagram", url: "https://www.instagram.com/goddermann/" }],
-    videos: [
-      {
-        title: l("Video destacado de Goddermann", "Goddermann's featured video"),
-        platform: "Instagram",
-        url: "https://www.instagram.com/p/DdKA0tfRvY0/",
-        embedUrl: "https://www.instagram.com/p/DdKA0tfRvY0/embed",
-        sourceUrl: "https://www.instagram.com/p/DdKA0tfRvY0/",
-      },
-    ],
+        socials: [{ platform: "Instagram", url: "https://www.instagram.com/goddermann/" }],
+    // videos: [
+    //   {
+    //     title: l("Video destacado de Goddermann", "Goddermann's featured video"),
+    //     platform: "Instagram",
+    //     url: "https://www.instagram.com/p/DdKA0tfRvY0/",
+    //     embedUrl: "https://www.instagram.com/p/DdKA0tfRvY0/embed",
+    //     sourceUrl: "https://www.instagram.com/p/DdKA0tfRvY0/",
+    //   },
+    // ],
     headline: {
       value: "11.6M",
       label: l("visualizaciones en Instagram (30 días)", "Instagram views (30 days)"),
@@ -707,7 +707,12 @@ export const TALENTS: Talent[] = [
         "Instagram records 96.6% reach among non-followers during the reported 30 days.",
       ),
     ],
-    skills: [],
+    skills: [
+      l("Formato corto", "Short-form"),
+      l("Alcance a no seguidores", "Reach beyond followers"),
+      l("Audiencia hispanohablante", "Spanish-speaking audience"),
+      l("TikTok + Instagram", "TikTok + Instagram"),
+    ],
   },
 ];
 
