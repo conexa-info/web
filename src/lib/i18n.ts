@@ -22,7 +22,13 @@ const es = {
   hero: {
     eyebrow: "Desarrollo comercial y cultura de redes",
     title: "Conectamos marcas con la nueva generación.",
-    subtitle: "Representamos talentos y desarrollamos colaboraciones.",
+    subtitle:
+      "Representamos creadores con audiencias reales en Argentina, Latinoamérica, España e Italia. Vos elegís el talento; nosotros pensamos la idea, escribimos el guion y coordinamos todo hasta que se publica.",
+    stats: {
+      talents: "talentos representados",
+      followers: "seguidores en sus comunidades",
+      views: "vistas por mes",
+    },
     body: "Creemos en las conexiones que generan valor. Por eso, acercamos a las marcas a los talentos adecuados y ayudamos a los creadores a convertir su creatividad en nuevas oportunidades.",
     primary: "Quiero trabajar con Conexa",
     secondary: "Soy creador",
@@ -127,12 +133,13 @@ const es = {
     open: "Ver más",
     close: "Cerrar",
     soon: "Datos en carga",
-    hint: "Tocá un nombre para desplegar el perfil",
+    cardFollowers: "Seguidores",
+    cardViews: "Vistas por mes",
+    approx: "Valores aproximados: suma de plataformas y períodos informados.",
     openProfile: "Tocá un nombre para ver su perfil completo.",
   },
   profile: {
     back: "Todos los talentos",
-    hello: "Hola, soy Luana.",
     about: "Sobre",
     stats: "Estadísticas destacadas",
     statsNote:
@@ -146,9 +153,6 @@ const es = {
     platforms: "Plataformas",
     compare: "Comparación de plataformas (seguidores)",
     pillars: "Pilares de contenido",
-    pillarsTitle: "Contenido que entretiene, conecta y genera curiosidad.",
-    pillarsText:
-      "Mi contenido combina entretenimiento, espontaneidad y una mirada personal sobre las tendencias y experiencias del día a día. Me gusta experimentar con ideas, formatos y recursos narrativos para crear videos que inviten a mirar, participar y compartir.",
     gallery: "Galería de contenido",
     featuredVideos: "Videos destacados",
     videosPending: "Selección pendiente",
@@ -164,22 +168,6 @@ const es = {
     galleryAll: "Todo",
     galleryEmpty:
       "Espacio reservado para videos reales. Se cargarán con enlaces a las publicaciones originales.",
-    gamesMetric: "2.9M visualizaciones en contenido de juegos y entretenimiento informado.",
-    geoTitle: "Una comunidad que conecta con Argentina y Latinoamérica.",
-    geoText:
-      "Lua combina una identidad de creadora argentina con una audiencia que también se extiende a otros mercados de Latinoamérica y España.",
-    pitchTitle: "Una creadora que convierte ideas en experiencias.",
-    pitchText:
-      "Con una comunidad de aproximadamente 1.6 millones de seguidores entre TikTok e Instagram, Lua desarrolla contenido de lifestyle, entretenimiento, moda, beauty y experiencias. Su estilo combina storytelling, creatividad y formatos dinámicos para integrar marcas en historias que despiertan curiosidad y conectan con una audiencia joven.",
-    strengths: [
-      { k: "Escala", v: "≈1.6M", d: "seguidores entre TikTok e Instagram" },
-      { k: "Atención", v: "13.6M", d: "visualizaciones en TikTok · últimos 60 días informados" },
-      {
-        k: "Diversidad",
-        v: "4.62M",
-        d: "visualizaciones en Instagram · últimos 30 días informados",
-      },
-    ],
     collabWith: "Consultar una colaboración con",
     whatsappWith: "Escribir por WhatsApp",
     pending: "Pendiente de revisión antes de publicar",
@@ -303,6 +291,7 @@ const es = {
       adult: "Necesitás ser mayor de edad para postularte.",
       categories: "Elegí al menos una categoría.",
       long: "El texto es demasiado largo.",
+      phone: "Ingresá un número válido con código de país (ej. +54 9 11 1234-5678).",
     },
     brand: {
       title: "Contanos qué necesita tu marca.",
@@ -312,28 +301,12 @@ const es = {
       email: "Email corporativo o de contacto",
       whatsapp: "WhatsApp",
       website: "Sitio web o Instagram de la marca",
-      campaignType: "Tipo de campaña",
       talent: "Talento de interés",
-      product: "Producto o servicio que querés promocionar",
-      objective: "Objetivo de la campaña",
       market: "País o mercado objetivo",
-      budget: "Presupuesto estimado",
-      date: "Fecha estimada de la campaña",
-      message: "Mensaje adicional",
       submit: "Solicitar propuesta",
       successTitle: "¡Recibimos tu consulta!",
       successBody:
         "Tu solicitud quedó registrada. Te vamos a contactar por email o WhatsApp para seguir la conversación.",
-      campaignTypes: [
-        "Contenido para redes sociales",
-        "Campaña con creadores",
-        "Integración de producto",
-        "Eventos y experiencias",
-        "Moda y beauty",
-        "Lifestyle y viajes",
-        "Entretenimiento",
-        "Otro",
-      ],
       talentOther: ["Quiero recibir recomendaciones", "Otro"],
     },
     creator: {
@@ -347,11 +320,17 @@ const es = {
       email: "Email",
       whatsapp: "WhatsApp",
       igUser: "Usuario de Instagram",
-      igUrl: "Enlace a Instagram",
       ttUser: "Usuario de TikTok",
-      ttUrl: "Enlace a TikTok",
       otherUrl: "YouTube u otras plataformas",
       followers: "Cantidad aproximada de seguidores",
+      followerRanges: [
+        "Menos de 10.000",
+        "10.000 – 50.000",
+        "50.000 – 100.000",
+        "100.000 – 500.000",
+        "500.000 – 1 millón",
+        "Más de 1 millón",
+      ],
       categories: "Categorías de contenido",
       description: "Descripción personal",
       featured: "Enlace a contenido destacado",
@@ -374,8 +353,76 @@ const es = {
         "Tecnología",
         "Otro",
       ],
-      atLeastOne: "Indicá al menos Instagram o TikTok.",
     },
+  },
+  faq: {
+    eyebrow: "Preguntas frecuentes",
+    title: "Lo que nos suelen preguntar.",
+    groups: [
+      {
+        id: "brands",
+        title: "Para marcas",
+        items: [
+          {
+            q: "¿Qué hace Conexa exactamente?",
+            a: "Conectamos marcas con creadores de contenido que tienen sentido para su audiencia. No solo buscamos el perfil: pensamos la idea, armamos el concepto y el guion, y coordinamos todo lo comercial para que vos no tengas que perseguir a nadie.",
+          },
+          {
+            q: "¿Por qué trabajar con una agencia y no contactar al creador directo?",
+            a: "Porque te ahorrás la búsqueda, la negociación y la coordinación. Te proponemos perfiles que encajan con tu marca, ideas que ya están pensadas para su audiencia, y un solo interlocutor para todo.",
+          },
+          {
+            q: "¿Con qué creadores trabajan?",
+            a: "Representamos talentos de humor, lifestyle, belleza, entretenimiento y experimentos sociales, con audiencias en Argentina y otros países, como Italia. Podés ver algunos en la sección Talentos.",
+          },
+          {
+            q: "¿Pueden hacer campañas fuera de Argentina?",
+            a: "Sí. Tenemos creadores con audiencias en otros países y trabajamos en español, inglés e italiano.",
+          },
+          {
+            q: "¿Cuánto cuesta una campaña?",
+            a: "Depende del alcance, de cuántos creadores sumes y del tipo de contenido. Mandanos tu brief y te armamos una propuesta a medida según tu presupuesto.",
+          },
+          {
+            q: "¿Cómo arrancamos?",
+            a: 'Completá el formulario "Quiero trabajar con Conexa" o escribinos por WhatsApp. Te respondemos a la brevedad, escuchamos qué necesitás y te traemos una propuesta.',
+          },
+          {
+            q: "¿Hacen acciones puntuales o solo campañas largas?",
+            a: "Las dos cosas. Igual nuestro objetivo es que la colaboración funcione tan bien que se convierta en una relación a largo plazo.",
+          },
+        ],
+      },
+      {
+        id: "creators",
+        title: "Para creadores",
+        items: [
+          {
+            q: "¿Cómo me postulo?",
+            a: 'Completá el formulario "Soy creador" con tus redes y contanos qué tipo de contenido hacés. Revisamos cada postulación.',
+          },
+          {
+            q: "¿Necesito una cantidad mínima de seguidores?",
+            a: "No miramos solo números: nos importa que tu contenido tenga identidad y una comunidad real. Tenemos creadores emergentes, lo que importa es la calidad de tu contenido.",
+          },
+          {
+            q: "¿Tengo que cambiar mi contenido para trabajar con marcas?",
+            a: "No. La idea es que crezcas sin perder tu esencia: buscamos marcas que encajen con vos, no al revés.",
+          },
+        ],
+      },
+    ],
+    general: "General",
+    contactQ: "¿Cómo los contacto?",
+    contactA: (email: string, phone: string, ig: string) =>
+      `Por mail a ${email}, por WhatsApp al ${phone}, o por Instagram en ${ig}.`,
+  },
+  consent: {
+    title: "¿Nos dejás medir las visitas?",
+    text: "Usamos Google Analytics para saber qué páginas sirven y mejorar el sitio. Solo se activa si aceptás.",
+    accept: "Aceptar",
+    reject: "Rechazar",
+    settings: "Preferencias de cookies",
   },
   footer: {
     tagline: "Conectamos marcas, creadores y oportunidades.",
@@ -385,7 +432,7 @@ const es = {
     instagram: "Instagram",
     linkedin: "LinkedIn",
     privacy:
-      "Aviso de privacidad: los datos enviados por formularios se usan solo para responder consultas y postulaciones. No se venden ni se comparten con terceros.",
+      "Aviso de privacidad: los datos enviados por formularios se usan solo para responder consultas y postulaciones. No se venden ni se comparten con terceros. Usamos Google Analytics para medir visitas solo si lo aceptás.",
     rights: "© 2026 CONEXA. Todos los derechos reservados.",
   },
   meta: {
@@ -450,7 +497,13 @@ const en: Dict = {
   hero: {
     eyebrow: "Business development & social culture",
     title: "We connect brands with the new generation.",
-    subtitle: "We represent talent and develop collaborations.",
+    subtitle:
+      "We represent creators with real audiences across Argentina, Latin America, Spain and Italy. You pick the talent; we shape the idea, write the script and handle everything until it goes live.",
+    stats: {
+      talents: "creators represented",
+      followers: "followers across their communities",
+      views: "views per month",
+    },
     body: "We believe in connections that create value. That's why we bring brands closer to the right talent and help creators turn their creativity into new opportunities.",
     primary: "I want to work with Conexa",
     secondary: "I'm a creator",
@@ -555,12 +608,13 @@ const en: Dict = {
     open: "Show more",
     close: "Close",
     soon: "Data coming soon",
-    hint: "Tap a name to open the profile",
+    cardFollowers: "Followers",
+    cardViews: "Views per month",
+    approx: "Approximate values: sum of platforms and reported periods.",
     openProfile: "Tap a name to see the full profile.",
   },
   profile: {
     back: "All talent",
-    hello: "Hi, I'm Luana.",
     about: "About",
     stats: "Key stats",
     statsNote:
@@ -574,9 +628,6 @@ const en: Dict = {
     platforms: "Platforms",
     compare: "Platform comparison (followers)",
     pillars: "Content pillars",
-    pillarsTitle: "Content that entertains, connects and sparks curiosity.",
-    pillarsText:
-      "My content blends entertainment, spontaneity and a personal take on everyday trends and experiences. I like experimenting with ideas, formats and storytelling devices to create videos that invite people to watch, join in and share.",
     gallery: "Content gallery",
     featuredVideos: "Featured videos",
     videosPending: "Selection pending",
@@ -592,18 +643,6 @@ const en: Dict = {
     galleryAll: "All",
     galleryEmpty:
       "Reserved space for real videos. They'll be added with links to the original posts.",
-    gamesMetric: "2.9M views on the reported games & entertainment content.",
-    geoTitle: "A community that connects with Argentina and Latin America.",
-    geoText:
-      "Lua combines an Argentine creator identity with an audience that also reaches other markets in Latin America and Spain.",
-    pitchTitle: "A creator who turns ideas into experiences.",
-    pitchText:
-      "With a community of roughly 1.6 million followers across TikTok and Instagram, Lua creates lifestyle, entertainment, fashion, beauty and experience content. Her style blends storytelling, creativity and dynamic formats to integrate brands into stories that spark curiosity and connect with a young audience.",
-    strengths: [
-      { k: "Scale", v: "≈1.6M", d: "followers across TikTok and Instagram" },
-      { k: "Attention", v: "13.6M", d: "TikTok views · last 60 reported days" },
-      { k: "Range", v: "4.62M", d: "Instagram views · last 30 reported days" },
-    ],
     collabWith: "Ask about a collaboration with",
     whatsappWith: "Message on WhatsApp",
     pending: "Pending review before publishing",
@@ -647,8 +686,8 @@ const en: Dict = {
     visionTitle: "What we're building",
     vision:
       "We aim to build a solid network of business opportunities. We're not after one-off deals, but a repeatable model where relationships evolve and keep adding value.",
-baseTitle: "Based in Buenos Aires, reaching the world",
-base: "We were born in Buenos Aires, where we work in person with brands, businesses and productions. From here we represent creators from different countries and bring together brands and talent from all over the world, wherever they are.",
+    baseTitle: "Based in Buenos Aires, reaching the world",
+    base: "We were born in Buenos Aires, where we work in person with brands, businesses and productions. From here we represent creators from different countries and bring together brands and talent from all over the world, wherever they are.",
   },
   how: {
     eyebrow: "How we work",
@@ -723,6 +762,7 @@ base: "We were born in Buenos Aires, where we work in person with brands, busine
       adult: "You must be 18 or older to apply.",
       categories: "Choose at least one category.",
       long: "This text is too long.",
+      phone: "Enter a valid number with country code (e.g. +1 555 123 4567).",
     },
     brand: {
       title: "Tell us what your brand needs.",
@@ -732,28 +772,12 @@ base: "We were born in Buenos Aires, where we work in person with brands, busine
       email: "Work or contact email",
       whatsapp: "WhatsApp",
       website: "Brand website or Instagram",
-      campaignType: "Campaign type",
       talent: "Talent of interest",
-      product: "Product or service to promote",
-      objective: "Campaign goal",
       market: "Target country or market",
-      budget: "Estimated budget",
-      date: "Estimated campaign date",
-      message: "Additional message",
       submit: "Request a proposal",
       successTitle: "We got your inquiry!",
       successBody:
         "Your request has been saved. We'll reach out by email or WhatsApp to keep the conversation going.",
-      campaignTypes: [
-        "Social media content",
-        "Creator campaign",
-        "Product integration",
-        "Events & experiences",
-        "Fashion & beauty",
-        "Lifestyle & travel",
-        "Entertainment",
-        "Other",
-      ],
       talentOther: ["I'd like recommendations", "Other"],
     },
     creator: {
@@ -767,11 +791,17 @@ base: "We were born in Buenos Aires, where we work in person with brands, busine
       email: "Email",
       whatsapp: "WhatsApp",
       igUser: "Instagram username",
-      igUrl: "Instagram link",
       ttUser: "TikTok username",
-      ttUrl: "TikTok link",
       otherUrl: "YouTube or other platforms",
       followers: "Approximate follower count",
+      followerRanges: [
+        "Under 10,000",
+        "10,000 – 50,000",
+        "50,000 – 100,000",
+        "100,000 – 500,000",
+        "500,000 – 1 million",
+        "Over 1 million",
+      ],
       categories: "Content categories",
       description: "About you",
       featured: "Link to featured content",
@@ -794,8 +824,76 @@ base: "We were born in Buenos Aires, where we work in person with brands, busine
         "Tech",
         "Other",
       ],
-      atLeastOne: "Add at least Instagram or TikTok.",
     },
+  },
+  faq: {
+    eyebrow: "FAQ",
+    title: "What people usually ask us.",
+    groups: [
+      {
+        id: "brands",
+        title: "For brands",
+        items: [
+          {
+            q: "What exactly does Conexa do?",
+            a: "We connect brands with content creators who make sense for their audience. We don't just find the profile: we shape the idea, build the concept and script, and handle everything commercial so you don't have to chase anyone.",
+          },
+          {
+            q: "Why work with an agency instead of contacting the creator directly?",
+            a: "Because you skip the search, the negotiation and the coordination. We suggest profiles that fit your brand, ideas already designed for their audience, and a single point of contact for everything.",
+          },
+          {
+            q: "Which creators do you work with?",
+            a: "We represent talent in humor, lifestyle, beauty, entertainment and social experiments, with audiences in Argentina and other countries, such as Italy. You can see some of them in the Talent section.",
+          },
+          {
+            q: "Can you run campaigns outside Argentina?",
+            a: "Yes. We have creators with audiences in other countries and we work in Spanish, English and Italian.",
+          },
+          {
+            q: "How much does a campaign cost?",
+            a: "It depends on the reach, how many creators you add and the type of content. Send us your brief and we'll put together a tailored proposal based on your budget.",
+          },
+          {
+            q: "How do we get started?",
+            a: 'Fill in the "I want to work with Conexa" form or message us on WhatsApp. We\'ll get back to you shortly, listen to what you need and bring you a proposal.',
+          },
+          {
+            q: "Do you do one-off actions or only long campaigns?",
+            a: "Both. That said, our goal is for the collaboration to work so well that it becomes a long-term relationship.",
+          },
+        ],
+      },
+      {
+        id: "creators",
+        title: "For creators",
+        items: [
+          {
+            q: "How do I apply?",
+            a: 'Fill in the "I\'m a creator" form with your socials and tell us what kind of content you make. We review every application.',
+          },
+          {
+            q: "Do I need a minimum number of followers?",
+            a: "We don't just look at numbers: we care that your content has identity and a real community. We work with emerging creators; what matters is the quality of your content.",
+          },
+          {
+            q: "Do I have to change my content to work with brands?",
+            a: "No. The idea is for you to grow without losing your essence: we look for brands that fit you, not the other way around.",
+          },
+        ],
+      },
+    ],
+    general: "General",
+    contactQ: "How do I contact you?",
+    contactA: (email: string, phone: string, ig: string) =>
+      `Email us at ${email}, message us on WhatsApp at ${phone}, or find us on Instagram at ${ig}.`,
+  },
+  consent: {
+    title: "Can we measure visits?",
+    text: "We use Google Analytics to learn which pages are useful and improve the site. It only runs if you accept.",
+    accept: "Accept",
+    reject: "Decline",
+    settings: "Cookie preferences",
   },
   footer: {
     tagline: "We connect brands, creators and opportunities.",
@@ -805,7 +903,7 @@ base: "We were born in Buenos Aires, where we work in person with brands, busine
     instagram: "Instagram",
     linkedin: "LinkedIn",
     privacy:
-      "Privacy notice: data sent through our forms is used only to reply to inquiries and applications. It is never sold or shared with third parties.",
+      "Privacy notice: data sent through our forms is used only to reply to inquiries and applications. It is never sold or shared with third parties. We use Google Analytics to measure visits only if you accept it.",
     rights: "© 2026 CONEXA. All rights reserved.",
   },
   meta: {

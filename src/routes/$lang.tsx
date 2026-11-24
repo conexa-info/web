@@ -1,5 +1,6 @@
 import { createFileRoute, notFound, Outlet } from "@tanstack/react-router";
 import { SiteFooter, SiteHeader } from "@/components/site/Shell";
+import { ConsentBanner } from "@/components/site/ConsentBanner";
 import { isLang } from "@/lib/i18n";
 
 export const Route = createFileRoute("/$lang")({
@@ -19,6 +20,7 @@ function LangLayout() {
         <Outlet />
       </main>
       <SiteFooter lang={l} />
+      <ConsentBanner lang={l} />
     </div>
   );
 }

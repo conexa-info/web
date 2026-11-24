@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { MessageCircle } from "lucide-react";
 import { CreatorForm } from "@/components/site/Forms";
+import { Faq } from "@/components/site/Faq";
 import { btn, Heading, Section } from "@/components/site/ui";
 import { whatsappLink } from "@/data/site";
 import { DICT, pageHead, useLang } from "@/lib/i18n";
@@ -58,6 +59,7 @@ function Creators() {
           <CreatorForm lang={lang} />
         </div>
       </section>
+      <Faq lang={lang} only={["creators", "general"]} />
     </>
   );
 }

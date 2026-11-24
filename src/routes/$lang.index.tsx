@@ -1,13 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import heroImg from "@/assets/hero-creator.jpg";
+import heroImg from "@/assets/hero-creator.webp";
 import { ConnectionFlow } from "@/components/site/ConnectionFlow";
-import { TalentLinks } from "@/components/site/TalentLinks";
+import { Faq, faqJsonLd } from "@/components/site/Faq";
+import { TalentGrid } from "@/components/site/TalentCard";
 import { HowSteps, ValueSection, WinWin } from "@/components/site/Sections";
 import { btn, Section } from "@/components/site/ui";
 import { TALENTS } from "@/data/talents";
 import { CONTACT, SOCIALS } from "@/data/site";
-import { pageHead, useLang, useT } from "@/lib/i18n";
+import { isLang, pageHead, useLang, useT } from "@/lib/i18n";
+import { floorForDisplay, formatCompact } from "@/lib/metric-format";
+
+const totalFollowers = floorForDisplay(TALENTS.reduce((n, t) => n + t.keyStats.followers, 0));
+const totalViews = floorForDisplay(TALENTS.reduce((n, t) => n + t.keyStats.monthlyViews, 0));
 
 export const Route = createFileRoute("/$lang/")({
   head: ({ params }) => ({
@@ -31,6 +36,10 @@ export const Route = createFileRoute("/$lang/")({
           founder: { "@type": "Person", name: "Santino Gioveni", sameAs: SOCIALS.founderLinkedIn },
         }),
       },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(faqJsonLd(isLang(params.lang) ? params.lang : "es")),
+      },
     ],
   }),
   component: Home,
@@ -47,9 +56,9 @@ function Home() {
           src={heroImg}
           alt=""
           aria-hidden
-          width={1024}
-          height={1280}
-          className="absolute inset-0 h-full w-full object-cover object-center opacity-40 blur-sm grayscale"
+          width={900}
+          height={1125}
+          className="absolute inset-0 h-full w-full object-cover object-center opacity-30 blur-sm"
         />
         <div className="absolute inset-0 bg-background/75" aria-hidden />
         <div className="relative mx-auto max-w-6xl">
@@ -76,7 +85,9 @@ function Home() {
             </span>
           </div>
           <div className="mt-5 md:mt-6">
-            <p className="max-w-xl text-lg leading-relaxed text-foreground">{t.hero.subtitle}</p>
+            <p className="max-w-2xl text-lg leading-relaxed text-foreground md:text-xl">
+              {t.hero.subtitle}
+            </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 to="/$lang/brands"
@@ -95,9 +106,40 @@ function Home() {
                 {t.hero.secondary}
               </Link>
             </div>
+            <dl className="mt-10 grid max-w-2xl grid-cols-3 gap-4 border-t pt-6">
+              {[
+                [String(TALENTS.length), t.hero.stats.talents],
+                [`+${formatCompact(totalFollowers, lang)}`, t.hero.stats.followers],
+                [`+${formatCompact(totalViews, lang)}`, t.hero.stats.views],
+              ].map(([v, l]) => (
+                <div key={l} className="flex min-w-0 flex-col-reverse justify-end">
+                  <dt className="mt-1 text-xs text-muted-foreground md:text-sm">{l}</dt>
+                  <dd className="font-display text-3xl text-neon md:text-5xl">{v}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
         </div>
       </section>
+
+      <Section id="talentos">
+        <div className="mb-8 grid min-w-0 gap-6 sm:flex sm:items-end sm:justify-between">
+          <div>
+            <p className="eyebrow mb-3">{t.home.talentsTitle}</p>
+            <h2 className="text-6xl leading-[0.85] md:text-8xl">
+              {t.nav.talents}
+              <sup className="ml-2 align-top font-sans text-lg text-primary">
+                {String(TALENTS.length).padStart(2, "0")}
+              </sup>
+            </h2>
+            <p className="mt-4 max-w-xl text-lg text-muted-foreground">{t.home.talentsText}</p>
+          </div>
+          <Link to="/$lang/talents" params={{ lang }} className={btn({ variant: "outline" })}>
+            {t.home.allTalents}
+          </Link>
+        </div>
+        <TalentGrid talents={TALENTS} lang={lang} />
+      </Section>
 
       <HowSteps lang={lang} />
       <ConnectionFlow lang={lang} />
@@ -136,27 +178,8 @@ function Home() {
         </div>
       </Section>
 
-      <Section>
-        <div className="grid min-w-0 gap-6 sm:flex sm:items-end sm:justify-between">
-          <h2 className="text-6xl leading-[0.85] md:text-9xl">
-            {t.nav.talents}
-            <sup className="ml-2 align-top font-sans text-lg text-primary">
-              {String(TALENTS.length).padStart(2, "0")}
-            </sup>
-          </h2>
-          <Link to="/$lang/talents" params={{ lang }} className={btn({ variant: "outline" })}>
-            {t.home.allTalents}
-          </Link>
-        </div>
-        <p className="mt-6 max-w-xl font-serif text-2xl italic text-muted-foreground">
-          {t.talents.international}
-        </p>
-        <div className="mt-8">
-          <TalentLinks talents={TALENTS} lang={lang} />
-        </div>
-      </Section>
-
       <WinWin lang={lang} />
+      <Faq lang={lang} />
     </>
   );
 }

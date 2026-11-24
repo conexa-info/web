@@ -6,6 +6,7 @@ import { CONTACT, SOCIALS, whatsappLink } from "@/data/site";
 import { DICT, type Lang } from "@/lib/i18n";
 import { btn } from "./ui";
 import { Button } from "@/components/ui/button";
+import { ConsentSettingsLink } from "./ConsentBanner";
 const logoWhite = "/logo-white.svg";
 const logoBlack = "/logo-black.svg";
 
@@ -263,6 +264,9 @@ export function SiteFooter({ lang }: { lang: Lang }) {
       </div>
       <div className="mx-auto mt-12 max-w-6xl border-t pt-6 text-xs text-muted-foreground">
         <p id="privacy">{d.footer.privacy}</p>
+        <p className="mt-3">
+          <ConsentSettingsLink lang={lang} />
+        </p>
         <p className="mt-3">{d.footer.rights}</p>
       </div>
     </footer>

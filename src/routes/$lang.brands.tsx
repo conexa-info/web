@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check } from "lucide-react";
 import { z } from "zod";
 import { BrandForm } from "@/components/site/Forms";
+import { Faq } from "@/components/site/Faq";
 import { btn, Heading, Section } from "@/components/site/ui";
 import { pageHead, useLang, useT } from "@/lib/i18n";
 
@@ -65,6 +66,7 @@ function Brands() {
           <BrandForm key={talent ?? "none"} lang={lang} defaultTalent={talent} />
         </div>
       </section>
+      <Faq lang={lang} only={["brands", "general"]} />
     </>
   );
 }

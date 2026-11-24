@@ -2,13 +2,16 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, Instagram, MessageCircle, Music2 } from "lucide-react";
 import { Bars } from "@/components/site/Bars";
 import { FeaturedVideos } from "@/components/site/FeaturedVideos";
+import { Reveal, useInView, useScrollProgress } from "@/components/site/Motion";
 import { TalentPhoto } from "@/components/site/TalentCard";
 import { btn, Pending, Section } from "@/components/site/ui";
-import { getTalent } from "@/data/talents";
-import { whatsappLink } from "@/data/site";
-import { DICT, isLang, pageHead, useLang } from "@/lib/i18n";
-import { formatMetric } from "@/lib/metric-format";
+import { getTalent, type Talent } from "@/data/talents";
+import { CONTACT, whatsappLink } from "@/data/site";
+import { DICT, isLang, pageHead, useLang, type Lang } from "@/lib/i18n";
+import { formatCompact, formatMetric } from "@/lib/metric-format";
 
+// One template for every creator, modelled on Lua's profile: each block renders
+// only when the talent record has the data for it.
 export const Route = createFileRoute("/$lang/talents/$slug")({
   loader: ({ params }) => {
     const t = getTalent(params.slug);
@@ -18,10 +21,56 @@ export const Route = createFileRoute("/$lang/talents/$slug")({
   head: ({ params, loaderData }) => {
     const lang = isLang(params.lang) ? params.lang : "es";
     if (!loaderData) return { meta: [{ title: "Conexa" }, { name: "robots", content: "noindex" }] };
-    return pageHead(lang, DICT[lang].meta.talent(loaderData.name), `talents/${loaderData.slug}`);
+    const t = getTalent(loaderData.slug)!;
+    const head = pageHead(
+      lang,
+      DICT[lang].meta.talent(loaderData.name),
+      `talents/${loaderData.slug}`,
+    );
+    return {
+      ...head,
+      scripts: [{ type: "application/ld+json", children: JSON.stringify(personJsonLd(t, lang)) }],
+    };
   },
   component: Profile,
 });
+
+/** schema.org ProfilePage so search engines and AI assistants link the creator to Conexa. */
+function personJsonLd(t: Talent, lang: Lang) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    inLanguage: lang,
+    url: `${CONTACT.siteUrl}/${lang}/talents/${t.slug}`,
+    mainEntity: {
+      "@type": "Person",
+      name: t.name,
+      alternateName: t.handle,
+      description: t.intro[lang],
+      jobTitle: lang === "es" ? "Creador de contenido" : "Content creator",
+      knowsAbout: t.categories.map((c) => c[lang]),
+      sameAs: t.socials.map((s) => s.url),
+      affiliation: { "@type": "Organization", name: "CONEXA", url: CONTACT.siteUrl },
+    },
+  };
+}
+
+function ParallaxPhoto({ talent, lang }: { talent: Talent; lang: Lang }) {
+  const { ref, p } = useScrollProgress<HTMLDivElement>();
+  const { ref: inRef, inView } = useInView<HTMLDivElement>(0.1);
+  return (
+    <div ref={ref} className="relative">
+      <div
+        ref={inRef}
+        data-in={inView}
+        className="grain aspect-[4/5] overflow-hidden rounded-3xl"
+        style={{ transform: `translateY(${(p - 0.5) * -40}px)` }}
+      >
+        <TalentPhoto talent={talent} lang={lang} eager className="settle" />
+      </div>
+    </div>
+  );
+}
 
 function Profile() {
   const lang = useLang();
@@ -30,7 +79,8 @@ function Profile() {
   const { slug } = Route.useParams();
   const t = getTalent(slug);
   if (!t) throw notFound();
-  const isLua = t.slug === "lua-sansat";
+  const first = t.name.split(" ")[0];
+  const k = t.keyStats;
 
   return (
     <>
@@ -45,11 +95,11 @@ function Profile() {
             <ArrowLeft className="h-4 w-4" /> {p.back}
           </Link>
           <div className="mt-8 grid items-center gap-10 md:grid-cols-[0.9fr_1.1fr]">
-            <div className="grain aspect-[4/5] overflow-hidden [&_img]:grayscale [&_img]:transition-all [&_img]:duration-1000 hover:[&_img]:grayscale-0">
-              <TalentPhoto talent={t} lang={lang} />
-            </div>
+            <ParallaxPhoto talent={t} lang={lang} />
             <div className="animate-rise min-w-0">
-              {isLua && <p className="font-display text-2xl font-bold text-primary">{p.hello}</p>}
+              {t.greeting && (
+                <p className="font-display text-2xl font-bold text-primary">{t.greeting[lang]}</p>
+              )}
               <h1 className="mt-2 text-5xl font-extrabold leading-none md:text-7xl">{t.name}</h1>
               <p className="mt-2 text-lg text-muted-foreground">
                 {t.handle}
@@ -66,14 +116,22 @@ function Profile() {
                 ))}
               </ul>
               <p className="mt-6 text-xl leading-relaxed">{t.intro[lang]}</p>
-              {t.slug === "lowkey" && t.headline && (
-                <div className="mt-6 border-t pt-5">
-                  <p className="font-display text-5xl text-primary">
-                    {formatMetric(t.headline.value, lang)}
-                  </p>
-                  <p className="mt-1 text-sm text-muted-foreground">{t.headline.label[lang]}</p>
+              <dl className="mt-6 grid max-w-md grid-cols-2 gap-4 border-t pt-5">
+                <div className="flex flex-col-reverse justify-end">
+                  <dt className="mt-1 text-sm text-muted-foreground">{d.talents.cardFollowers}</dt>
+                  <dd className="font-display text-4xl md:text-5xl">
+                    {k.followersPrefix ?? ""}
+                    {formatCompact(k.followers, lang)}
+                  </dd>
                 </div>
-              )}
+                <div className="flex flex-col-reverse justify-end">
+                  <dt className="mt-1 text-sm text-muted-foreground">{d.talents.cardViews}</dt>
+                  <dd className="font-display text-4xl text-neon md:text-5xl">
+                    {k.viewsApprox ? "≈" : ""}
+                    {formatCompact(k.monthlyViews, lang)}
+                  </dd>
+                </div>
+              </dl>
               <div className="mt-6 flex flex-wrap gap-2">
                 {t.socials.map((s) => (
                   <a
@@ -100,7 +158,7 @@ function Profile() {
                   hash="brief"
                   className={btn({ size: "lg" })}
                 >
-                  {p.collabWith} {t.name.split(" ")[0]}
+                  {p.collabWith} {first}
                 </Link>
                 <a
                   href={whatsappLink(d.contact.waTalent(t.name))}
@@ -118,40 +176,38 @@ function Profile() {
 
       {t.bio && (
         <Section className="bg-card">
-          <p className="eyebrow mb-4">
-            {p.about} {t.name.split(" ")[0]}
-          </p>
-          <div className="grid gap-6 md:grid-cols-2">
-            {t.bio.map((b) => (
-              <p key={b.es} className="text-lg leading-relaxed">
-                {b[lang]}
-              </p>
-            ))}
-          </div>
-          {t.audienceReach && <p className="mt-8 text-muted-foreground">{t.audienceReach[lang]}</p>}
+          <Reveal>
+            <p className="eyebrow mb-4">
+              {p.about} {first}
+            </p>
+            <div className="grid gap-6 md:grid-cols-2">
+              {t.bio.map((b) => (
+                <p key={b.es} className="text-lg leading-relaxed">
+                  {b[lang]}
+                </p>
+              ))}
+            </div>
+            {t.audienceReach && (
+              <p className="mt-8 text-muted-foreground">{t.audienceReach[lang]}</p>
+            )}
+          </Reveal>
         </Section>
       )}
 
-      {isLua && (
+      {t.highlights && (
         <section className="bg-ink px-5 py-16 text-ink-foreground md:px-8">
-          <div className="mx-auto grid max-w-6xl gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            {[
-              ["1.4M", lang === "es" ? "seguidores en TikTok" : "TikTok followers"],
-              ["190K", lang === "es" ? "seguidores en Instagram" : "Instagram followers"],
-              [
-                "13.6M",
-                lang === "es" ? "visualizaciones TikTok · 60 días" : "TikTok views · 60 days",
-              ],
-              [
-                "4.62M",
-                lang === "es" ? "visualizaciones Instagram · 30 días" : "Instagram views · 30 days",
-              ],
-              ["73.5%", lang === "es" ? "audiencia de 18 a 34 años" : "audience aged 18–34"],
-            ].map(([v, l]) => (
-              <div key={l} className="rounded-3xl border border-ink-foreground/15 p-6">
-                <p className="font-display text-4xl font-extrabold text-gradient">{v}</p>
-                <p className="mt-1 text-sm opacity-80">{l}</p>
-              </div>
+          <div
+            className={`mx-auto grid max-w-6xl gap-4 sm:grid-cols-2 ${t.highlights.length > 4 ? "lg:grid-cols-5" : "lg:grid-cols-4"}`}
+          >
+            {t.highlights.map((m, i) => (
+              <Reveal key={m.label.es} delay={i * 90}>
+                <div className="h-full rounded-3xl border border-ink-foreground/15 p-6">
+                  <p className="font-display text-4xl font-extrabold text-gradient">
+                    {formatMetric(m.value, lang, m.format)}
+                  </p>
+                  <p className="mt-1 text-sm opacity-80">{m.label[lang]}</p>
+                </div>
+              </Reveal>
             ))}
           </div>
         </section>
@@ -161,9 +217,9 @@ function Profile() {
         <Section>
           <div className="grid gap-12 md:grid-cols-2">
             {t.whyWork.length > 0 && (
-              <div>
+              <Reveal>
                 <h2 className="text-4xl md:text-6xl">
-                  {d.talents.why} <span className="text-neon">{t.name.split(" ")[0]}</span>
+                  {d.talents.why} <span className="text-neon">{first}</span>
                 </h2>
                 <ol className="mt-8 space-y-4">
                   {t.whyWork.map((w, j) => (
@@ -173,10 +229,10 @@ function Profile() {
                     </li>
                   ))}
                 </ol>
-              </div>
+              </Reveal>
             )}
             {t.skills.length > 0 && (
-              <div>
+              <Reveal delay={120}>
                 <h2 className="text-4xl md:text-6xl">{d.talents.skills}</h2>
                 <ul className="mt-8 flex flex-wrap gap-3">
                   {t.skills.map((s) => (
@@ -188,7 +244,7 @@ function Profile() {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </Reveal>
             )}
           </div>
         </Section>
@@ -196,11 +252,13 @@ function Profile() {
 
       {t.groups.length > 0 && (
         <Section>
-          <h2 className="text-3xl font-bold md:text-4xl">{p.stats}</h2>
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{p.statsNote}</p>
+          <Reveal>
+            <h2 className="text-3xl font-bold md:text-4xl">{p.stats}</h2>
+            <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{p.statsNote}</p>
+          </Reveal>
           <div className="mt-10 space-y-10">
             {t.groups.map((g) => (
-              <div key={g.title.es}>
+              <Reveal key={g.title.es}>
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 gap-y-1 sm:flex sm:flex-wrap">
                   <h3 className="text-xl font-bold">{g.title[lang]}</h3>
                   {g.period && (
@@ -225,54 +283,52 @@ function Profile() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </Reveal>
             ))}
           </div>
-          {isLua && (
-            <div className="mt-10 rounded-3xl border bg-card p-6 md:p-8">
-              <h3 className="font-bold">{p.compare}</h3>
-              <div className="mt-4">
-                <Bars
-                  items={[
-                    { label: "TikTok · 1.4M", value: 1400 },
-                    { label: "Instagram · 190K", value: 190 },
-                  ]}
-                />
+          {t.platformFollowers && (
+            <Reveal className="mt-10">
+              <div className="rounded-3xl border bg-card p-6 md:p-8">
+                <h3 className="font-bold">{p.compare}</h3>
+                <div className="mt-4">
+                  <Bars
+                    lang={lang}
+                    format={(v) => formatCompact(v, lang)}
+                    items={t.platformFollowers.map((f) => ({ label: f.platform, value: f.value }))}
+                  />
+                </div>
               </div>
-              <p className="mt-3 text-xs text-muted-foreground">
-                {lang === "es"
-                  ? "Barras proporcionales a la cantidad de seguidores; el número se muestra en miles."
-                  : "Bars proportional to follower count; value shown in thousands."}
-              </p>
-            </div>
+            </Reveal>
           )}
         </Section>
       )}
 
       {(t.age || t.gender || t.countries) && (
         <Section className="bg-soft">
-          <h2 className="text-3xl font-bold md:text-4xl">{p.audience}</h2>
-          {t.audienceNote && (
-            <p className="mt-3 max-w-3xl text-sm text-muted-foreground">{t.audienceNote[lang]}</p>
-          )}
-          {t.age?.highlight && (
-            <p className="mt-4 font-display text-2xl font-bold text-primary">
-              {t.age.highlight[lang]}
-            </p>
-          )}
+          <Reveal>
+            <h2 className="text-3xl font-bold md:text-4xl">{p.audience}</h2>
+            {t.audienceNote && (
+              <p className="mt-3 max-w-3xl text-sm text-muted-foreground">{t.audienceNote[lang]}</p>
+            )}
+            {t.age?.highlight && (
+              <p className="mt-4 font-display text-2xl font-bold text-primary">
+                {t.age.highlight[lang]}
+              </p>
+            )}
+          </Reveal>
           <div className="mt-10 grid gap-6 lg:grid-cols-3">
             {t.age && (
-              <div className="rounded-3xl bg-card p-6 shadow-card">
+              <Reveal className="rounded-3xl bg-card p-6 shadow-card">
                 <h3 className="mb-5 font-bold">{t.age.title[lang]}</h3>
                 <Bars
                   lang={lang}
                   decimals={t.audienceDecimals}
                   items={t.age.items.map((i) => ({ label: i.label[lang], value: i.value }))}
                 />
-              </div>
+              </Reveal>
             )}
             {t.gender && (
-              <div className="rounded-3xl bg-card p-6 shadow-card">
+              <Reveal delay={100} className="rounded-3xl bg-card p-6 shadow-card">
                 <h3 className="mb-5 font-bold">{p.gender}</h3>
                 <Bars
                   lang={lang}
@@ -280,10 +336,10 @@ function Profile() {
                   max={100}
                   items={t.gender.items.map((i) => ({ label: i.label[lang], value: i.value }))}
                 />
-              </div>
+              </Reveal>
             )}
             {t.countries && (
-              <div className="rounded-3xl bg-card p-6 shadow-card">
+              <Reveal delay={200} className="rounded-3xl bg-card p-6 shadow-card">
                 <h3 className="mb-5 font-bold">{p.countries}</h3>
                 <Bars
                   lang={lang}
@@ -294,11 +350,11 @@ function Profile() {
                     prefix: c.flag,
                   }))}
                 />
-              </div>
+              </Reveal>
             )}
           </div>
           {t.languages && (
-            <div className="mt-8 max-w-xl">
+            <Reveal className="mt-8 max-w-xl">
               <h3 className="mb-5 font-bold">{p.languages}</h3>
               <Bars
                 lang={lang}
@@ -306,50 +362,71 @@ function Profile() {
                 max={100}
                 items={t.languages.map((i) => ({ label: i.label[lang], value: i.value }))}
               />
-            </div>
+            </Reveal>
           )}
-          {isLua && (
-            <div className="mt-10 max-w-3xl">
-              <h3 className="text-2xl font-bold">{p.geoTitle}</h3>
-              <p className="mt-2 text-muted-foreground">{p.geoText}</p>
-            </div>
+          {t.geo && (
+            <Reveal className="mt-10 max-w-3xl">
+              <h3 className="text-2xl font-bold">{t.geo.title[lang]}</h3>
+              <p className="mt-2 text-muted-foreground">{t.geo.text[lang]}</p>
+            </Reveal>
           )}
         </Section>
       )}
 
       {t.pillars && (
         <Section>
-          <p className="eyebrow mb-4">{p.pillars}</p>
-          <h2 className="max-w-3xl text-3xl font-bold md:text-5xl">{p.pillarsTitle}</h2>
-          <p className="mt-5 max-w-3xl text-lg text-muted-foreground">{p.pillarsText}</p>
+          <Reveal>
+            <p className="eyebrow mb-4">{p.pillars}</p>
+            {t.pillarsIntro && (
+              <>
+                <h2 className="max-w-3xl text-3xl font-bold md:text-5xl">
+                  {t.pillarsIntro.title[lang]}
+                </h2>
+                <p className="mt-5 max-w-3xl text-lg text-muted-foreground">
+                  {t.pillarsIntro.text[lang]}
+                </p>
+              </>
+            )}
+          </Reveal>
           <div className="mt-10 grid gap-5 sm:grid-cols-2">
             {t.pillars.map((pl, i) => (
-              <div key={pl.title.es} className="lift rounded-3xl border bg-card p-7">
-                <span className="font-display text-sm font-bold text-primary">0{i + 1}</span>
-                <h3 className="mt-2 text-xl font-bold">{pl.title[lang]}</h3>
-                <p className="mt-2 text-muted-foreground">{pl.text[lang]}</p>
-              </div>
+              <Reveal key={pl.title.es} delay={(i % 2) * 120}>
+                <div className="lift h-full rounded-3xl border bg-card p-7">
+                  <span className="font-display text-sm font-bold text-primary">0{i + 1}</span>
+                  <h3 className="mt-2 text-xl font-bold">{pl.title[lang]}</h3>
+                  <p className="mt-2 text-muted-foreground">{pl.text[lang]}</p>
+                </div>
+              </Reveal>
             ))}
           </div>
-
-          {isLua && <p className="mt-8 text-sm text-muted-foreground">{p.gamesMetric}</p>}
+          {t.pillarsNote && (
+            <p className="mt-8 text-sm text-muted-foreground">{t.pillarsNote[lang]}</p>
+          )}
         </Section>
       )}
 
       <FeaturedVideos talent={t} lang={lang} />
 
-      {isLua && (
+      {t.pitch && (
         <section className="bg-ink px-5 py-12 text-ink-foreground md:px-8">
           <div className="mx-auto max-w-6xl">
-            <h2 className="max-w-3xl text-3xl font-bold md:text-5xl">{p.pitchTitle}</h2>
-            <p className="mt-5 max-w-3xl text-lg opacity-80">{p.pitchText}</p>
+            <Reveal>
+              <h2 className="max-w-3xl text-3xl font-bold md:text-5xl">{t.pitch.title[lang]}</h2>
+              <p className="mt-5 max-w-3xl text-lg opacity-80">{t.pitch.text[lang]}</p>
+            </Reveal>
             <div className="mt-10 grid gap-4 md:grid-cols-3">
-              {p.strengths.map((s) => (
-                <div key={s.k} className="rounded-3xl border border-ink-foreground/15 p-7">
-                  <p className="text-xs font-bold uppercase tracking-widest opacity-60">{s.k}</p>
-                  <p className="mt-2 font-display text-5xl font-extrabold text-gradient">{s.v}</p>
-                  <p className="mt-2 text-sm opacity-80">{s.d}</p>
-                </div>
+              {t.pitch.strengths.map((s, i) => (
+                <Reveal key={s.k.es} delay={i * 110}>
+                  <div className="h-full rounded-3xl border border-ink-foreground/15 p-7">
+                    <p className="text-xs font-bold uppercase tracking-widest opacity-60">
+                      {s.k[lang]}
+                    </p>
+                    <p className="mt-2 font-display text-5xl font-extrabold text-gradient">
+                      {formatMetric(s.v, lang)}
+                    </p>
+                    <p className="mt-2 text-sm opacity-80">{s.d[lang]}</p>
+                  </div>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -357,29 +434,31 @@ function Profile() {
       )}
 
       <Section>
-        <div className="rounded-[2rem] bg-gradient-brand p-8 text-primary-foreground md:p-14">
-          <h2 className="text-3xl font-bold md:text-4xl">{p.opportunitiesTitle}</h2>
-          <p className="mt-3 max-w-2xl opacity-90">{p.opportunitiesText}</p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              to="/$lang/brands"
-              params={{ lang }}
-              search={{ talent: t.slug }}
-              hash="brief"
-              className={btn({ variant: "light", size: "lg" })}
-            >
-              {p.collabWith} {t.name.split(" ")[0]}
-            </Link>
-            <a
-              href={whatsappLink(d.contact.waTalent(t.name))}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={btn({ variant: "ink", size: "lg" })}
-            >
-              <MessageCircle className="h-4 w-4" /> WhatsApp
-            </a>
+        <Reveal>
+          <div className="rounded-[2rem] bg-gradient-brand p-8 text-primary-foreground md:p-14">
+            <h2 className="text-3xl font-bold md:text-4xl">{p.opportunitiesTitle}</h2>
+            <p className="mt-3 max-w-2xl opacity-90">{p.opportunitiesText}</p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                to="/$lang/brands"
+                params={{ lang }}
+                search={{ talent: t.slug }}
+                hash="brief"
+                className={btn({ variant: "light", size: "lg" })}
+              >
+                {p.collabWith} {first}
+              </Link>
+              <a
+                href={whatsappLink(d.contact.waTalent(t.name))}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={btn({ variant: "ink", size: "lg" })}
+              >
+                <MessageCircle className="h-4 w-4" /> WhatsApp
+              </a>
+            </div>
           </div>
-        </div>
+        </Reveal>
         <p className="mt-6 text-sm text-muted-foreground">{p.dataNote}</p>
         {t.pendingReview && (
           <div className="mt-8">

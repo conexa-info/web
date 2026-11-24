@@ -220,6 +220,14 @@
     transform: none;
   }
 }
+/* Photo starts slightly zoomed and settles when its card/section scrolls into view. */
+@utility settle {
+  transform: scale(1.15);
+  transition: transform 1.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  [data-in="true"] & {
+    transform: scale(1);
+  }
+}
 @keyframes travel {
   0% {
     left: 0%;
@@ -282,7 +290,8 @@
     scroll-behavior: auto;
   }
   .reveal,
-  .rise-in {
+  .rise-in,
+  .settle {
     clip-path: none !important;
     opacity: 1 !important;
     transform: none !important;

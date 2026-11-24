@@ -13,3 +13,12 @@
 - [x] Home: la sección de creadores queda solo como acceso al perfil (categoría + botón), sin info expandida.
 - [x] Reemplazar el logo de texto por el logo oficial Conexa (SVG blanco/negro) y usarlo en encabezado, pie y favicon.
 - [x] Pie y Contacto: mostrar solo el email y el número directo de WhatsApp, sin la palabra "WhatsApp".
+- [x] Formularios: trampa anti-spam, WhatsApp con formato válido, seguidores por rango, evento `generate_lead` en Analytics y aviso por email al equipo.
+- [x] Google Analytics solo con consentimiento (banner + "Preferencias de cookies" en el pie).
+- [x] Imágenes comprimidas (~50% menos) y limpieza de componentes/dependencias sin uso.
+- [ ] Activar el aviso por email: cargar el secreto `RESEND_API_KEY` (y opcional `LEADS_NOTIFY_TO` / `LEADS_NOTIFY_FROM` con dominio verificado en Resend).
+- [ ] Sumar casos de éxito o logos de marcas (requiere datos reales de Conexa).
+- [x] Home: talentos primero en cards (3 col / 2 en celu) con seguidores y vistas por mes; fotos a color con efectos de scroll; hero con cifras totales.
+- [x] Perfiles: plantilla única basada en Lua (bloques según datos de cada talento) y datos estructurados por creador.
+- [x] Formulario de marcas reducido (WhatsApp obligatorio) y preguntas frecuentes con datos estructurados en home, marcas y creadores.
+- [ ] Confirmar vistas mensuales aproximadas de Lua (≈11,4M) y Lowkey (≈8,2M), calculadas a partir de períodos de 60 y 28 días.

@@ -77,16 +77,16 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
-    { charSet: "utf-8" },
-    { name: "viewport", content: "width=device-width, initial-scale=1" },
-    { name: "author", content: "CONEXA" },
-    { property: "og:image", content: "https://www.conexa-agency.com.ar/og.png" },
-    { property: "og:image:width", content: "1200" },
-    { property: "og:image:height", content: "630" },
-    { property: "og:site_name", content: "Conexa" },
-    { name: "twitter:card", content: "summary_large_image" },
-    { name: "twitter:image", content: "https://www.conexa-agency.com.ar/og.png" },
-    ],  
+      { charSet: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "author", content: "CONEXA" },
+      { property: "og:image", content: "https://www.conexa-agency.com.ar/og.png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:site_name", content: "Conexa" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "https://www.conexa-agency.com.ar/og.png" },
+    ],
     links: [
       {
         rel: "stylesheet",
@@ -101,20 +101,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap",
       },
     ],
-    scripts: [
-      {
-        src: "https://www.googletagmanager.com/gtag/js?id=G-V0LMBMH207",
-        async: true,
-      },
-      {
-        children: `
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-V0LMBMH207');
-        `,
-      },
-    ],
+    // Google Analytics is loaded from the consent banner (see src/lib/analytics.ts).
   }),
   shellComponent: RootShell,
   component: RootComponent,

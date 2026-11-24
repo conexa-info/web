@@ -12,7 +12,7 @@ import type { Lang } from "@/lib/i18n";
 
 // Single source of truth for creator profiles. Add a new object to TALENTS to
 // publish a new creator: the cards, profile page, forms and sitemap pick it up.
- 
+
 type L = Record<Lang, string>;
 
 export interface Metric {
@@ -36,6 +36,21 @@ export interface FeaturedVideo {
   url: string;
   embedUrl: string;
   sourceUrl: string;
+}
+/**
+ * Metrics shown on talent cards. Exact numbers; display helpers handle locale.
+ * `followersPrefix` / `viewsApprox` flag figures summed across platforms or periods.
+ */
+export interface KeyStats {
+  followers: number;
+  followersPrefix?: "+" | "≈";
+  monthlyViews: number;
+  viewsApprox?: boolean;
+}
+export interface Strength {
+  k: L;
+  v: string | number;
+  d: L;
 }
 export interface Talent {
   slug: string;
@@ -64,6 +79,15 @@ export interface Talent {
   countries?: { flag: string; label: L; value: number }[];
   pillars?: { title: L; text: L }[];
   pendingReview?: L[];
+  keyStats: KeyStats;
+  /** Big-number band right after the bio. */
+  highlights?: Metric[];
+  greeting?: L;
+  platformFollowers?: { platform: "TikTok" | "Instagram"; value: number }[];
+  geo?: { title: L; text: L };
+  pillarsIntro?: { title: L; text: L };
+  pillarsNote?: L;
+  pitch?: { title: L; text: L; strengths: Strength[] };
 }
 
 const l = (es: string, en: string): L => ({ es, en });
@@ -118,6 +142,89 @@ export const TALENTS: Talent[] = [
     headline: {
       value: "≈1.6M",
       label: l("seguidores entre TikTok e Instagram", "followers across TikTok and Instagram"),
+    },
+    // Monthly views ≈ Instagram 4.62M (30 days) + TikTok 13.6M / 2 (60 days).
+    keyStats: {
+      followers: 1590000,
+      followersPrefix: "≈",
+      monthlyViews: 11420000,
+      viewsApprox: true,
+    },
+    greeting: l("Hola, soy Luana.", "Hi, I'm Luana."),
+    highlights: [
+      { value: "1.4M", label: l("seguidores en TikTok", "TikTok followers") },
+      { value: "190K", label: l("seguidores en Instagram", "Instagram followers") },
+      { value: "13.6M", label: l("visualizaciones TikTok · 60 días", "TikTok views · 60 days") },
+      {
+        value: "4.62M",
+        label: l("visualizaciones Instagram · 30 días", "Instagram views · 30 days"),
+      },
+      {
+        value: 73.5,
+        format: "percent",
+        label: l("audiencia de 18 a 34 años", "audience aged 18–34"),
+      },
+    ],
+    platformFollowers: [
+      { platform: "TikTok", value: 1400000 },
+      { platform: "Instagram", value: 190000 },
+    ],
+    geo: {
+      title: l(
+        "Una comunidad que conecta con Argentina y Latinoamérica.",
+        "A community that connects with Argentina and Latin America.",
+      ),
+      text: l(
+        "Lua combina una identidad de creadora argentina con una audiencia que también se extiende a otros mercados de Latinoamérica y España.",
+        "Lua combines an Argentine creator identity with an audience that also reaches other markets in Latin America and Spain.",
+      ),
+    },
+    pillarsIntro: {
+      title: l(
+        "Contenido que entretiene, conecta y genera curiosidad.",
+        "Content that entertains, connects and sparks curiosity.",
+      ),
+      text: l(
+        "Mi contenido combina entretenimiento, espontaneidad y una mirada personal sobre las tendencias y experiencias del día a día. Me gusta experimentar con ideas, formatos y recursos narrativos para crear videos que inviten a mirar, participar y compartir.",
+        "My content blends entertainment, spontaneity and a personal take on everyday trends and experiences. I like experimenting with ideas, formats and storytelling devices to create videos that invite people to watch, join in and share.",
+      ),
+    },
+    pillarsNote: l(
+      "2.9M visualizaciones en contenido de juegos y entretenimiento informado.",
+      "2.9M views on the reported games & entertainment content.",
+    ),
+    pitch: {
+      title: l(
+        "Una creadora que convierte ideas en experiencias.",
+        "A creator who turns ideas into experiences.",
+      ),
+      text: l(
+        "Con una comunidad de aproximadamente 1.6 millones de seguidores entre TikTok e Instagram, Lua desarrolla contenido de lifestyle, entretenimiento, moda, beauty y experiencias. Su estilo combina storytelling, creatividad y formatos dinámicos para integrar marcas en historias que despiertan curiosidad y conectan con una audiencia joven.",
+        "With a community of roughly 1.6 million followers across TikTok and Instagram, Lua creates lifestyle, entertainment, fashion, beauty and experience content. Her style blends storytelling, creativity and dynamic formats to integrate brands into stories that spark curiosity and connect with a young audience.",
+      ),
+      strengths: [
+        {
+          k: l("Escala", "Scale"),
+          v: "≈1.6M",
+          d: l("seguidores entre TikTok e Instagram", "followers across TikTok and Instagram"),
+        },
+        {
+          k: l("Atención", "Attention"),
+          v: "13.6M",
+          d: l(
+            "visualizaciones en TikTok · últimos 60 días informados",
+            "TikTok views · last 60 reported days",
+          ),
+        },
+        {
+          k: l("Diversidad", "Range"),
+          v: "4.62M",
+          d: l(
+            "visualizaciones en Instagram · últimos 30 días informados",
+            "Instagram views · last 30 reported days",
+          ),
+        },
+      ],
     },
     groups: [
       {
@@ -271,6 +378,55 @@ export const TALENTS: Talent[] = [
       value: "+460K",
       label: l("audiencia acumulada TikTok + Instagram", "combined TikTok + Instagram audience"),
     },
+    // Monthly views = TikTok 26.4M + Instagram 8.5M.
+    keyStats: { followers: 460000, followersPrefix: "+", monthlyViews: 34900000 },
+    highlights: [
+      { value: "+460K", label: l("audiencia TikTok + Instagram", "TikTok + Instagram audience") },
+      { value: "26.4M", label: l("vistas mensuales en TikTok", "monthly TikTok views") },
+      { value: "8.5M", label: l("vistas mensuales en Instagram", "monthly Instagram views") },
+      {
+        value: 79.9,
+        format: "percent",
+        label: l("audiencia TikTok de 18 a 34 años", "TikTok audience aged 18–34"),
+      },
+    ],
+    geo: {
+      title: l(
+        "Una comunidad que conecta con Argentina y Latinoamérica.",
+        "A community that connects with Argentina and Latin America.",
+      ),
+      text: l(
+        "El 42.7% de su audiencia está en Argentina, con presencia en México, Chile, Perú y Colombia.",
+        "42.7% of his audience is in Argentina, with presence in Mexico, Chile, Peru and Colombia.",
+      ),
+    },
+    pitch: {
+      title: l("Humor urbano que la gente comparte.", "Urban humor people share."),
+      text: l(
+        "Con más de 460K seguidores entre TikTok e Instagram, Spiky hace videos cortos de humor urbano y tendencias. Suma 26.4M de vistas mensuales en TikTok y le habla a una audiencia joven: el 79.9% tiene entre 18 y 34 años.",
+        "With 460K+ followers across TikTok and Instagram, Spiky makes short urban-humor and trend videos. He gets 26.4M monthly views on TikTok and speaks to a young audience: 79.9% is aged 18–34.",
+      ),
+      strengths: [
+        {
+          k: l("Escala", "Scale"),
+          v: "+460K",
+          d: l("audiencia acumulada TikTok + Instagram", "combined TikTok + Instagram audience"),
+        },
+        {
+          k: l("Atención", "Attention"),
+          v: "26.4M",
+          d: l("vistas mensuales en TikTok", "monthly TikTok views"),
+        },
+        {
+          k: l("Alcance", "Reach"),
+          v: "8.2M",
+          d: l(
+            "vistas mensuales de no seguidores en Instagram",
+            "monthly Instagram views from non-followers",
+          ),
+        },
+      ],
+    },
     groups: [
       {
         title: l("Métricas mensuales", "Monthly metrics"),
@@ -391,6 +547,52 @@ export const TALENTS: Talent[] = [
       value: "+205K",
       label: l("audiencia acumulada TikTok + Instagram", "combined TikTok + Instagram audience"),
     },
+    // Monthly views = TikTok 9.6M + Instagram 11.7M.
+    keyStats: { followers: 205000, followersPrefix: "+", monthlyViews: 21300000 },
+    highlights: [
+      { value: "+205K", label: l("audiencia TikTok + Instagram", "TikTok + Instagram audience") },
+      { value: "9.6M", label: l("vistas mensuales en TikTok", "monthly TikTok views") },
+      { value: "11.7M", label: l("vistas mensuales en Instagram", "monthly Instagram views") },
+      {
+        value: 80.1,
+        format: "percent",
+        label: l("audiencia TikTok de 18 a 34 años", "TikTok audience aged 18–34"),
+      },
+    ],
+    geo: {
+      title: l("Una comunidad con base en Argentina.", "A community rooted in Argentina."),
+      text: l(
+        "El 55.3% de su audiencia está en Argentina; también lo siguen desde España, México, Perú y Chile.",
+        "55.3% of his audience is in Argentina; he's also followed from Spain, Mexico, Peru and Chile.",
+      ),
+    },
+    pitch: {
+      title: l("Experimentos sociales que nadie espera.", "Social experiments nobody sees coming."),
+      text: l(
+        "FelBuck_ hace entretenimiento y experimentos sociales en la calle. Suma 21.3M de vistas mensuales entre TikTok e Instagram, con una audiencia equilibrada entre mujeres y hombres, y formatos donde la marca forma parte de la dinámica.",
+        "FelBuck_ makes entertainment and street social experiments. He reaches 21.3M monthly views across TikTok and Instagram, with an audience balanced between women and men, and formats where the brand is part of the game.",
+      ),
+      strengths: [
+        {
+          k: l("Escala", "Scale"),
+          v: "+205K",
+          d: l("audiencia acumulada TikTok + Instagram", "combined TikTok + Instagram audience"),
+        },
+        {
+          k: l("Atención", "Attention"),
+          v: "11.7M",
+          d: l(
+            "vistas mensuales en Instagram, sobre todo Reels",
+            "monthly Instagram views, mostly Reels",
+          ),
+        },
+        {
+          k: l("Equilibrio", "Balance"),
+          v: "49% / 48%",
+          d: l("audiencia de mujeres y hombres", "women and men in the audience"),
+        },
+      ],
+    },
     groups: [
       {
         title: l("Métricas mensuales", "Monthly metrics"),
@@ -508,7 +710,7 @@ export const TALENTS: Talent[] = [
       "93% de su audiencia está en Italia; 94% habla italiano.",
       "93% of his audience is in Italy; 94% speaks Italian.",
     ),
-        socials: [{ platform: "Instagram", url: "https://www.instagram.com/goddermann/" }],
+    socials: [{ platform: "Instagram", url: "https://www.instagram.com/goddermann/" }],
     // videos: [
     //   {
     //     title: l("Video destacado de Goddermann", "Goddermann's featured video"),
@@ -521,6 +723,48 @@ export const TALENTS: Talent[] = [
     headline: {
       value: "11.6M",
       label: l("visualizaciones en Instagram (30 días)", "Instagram views (30 days)"),
+    },
+    keyStats: { followers: 48762, monthlyViews: 11658802 },
+    highlights: [
+      { value: 48762, label: l("seguidores en Instagram", "Instagram followers") },
+      { value: "11.6M", label: l("visualizaciones · 30 días", "views · 30 days") },
+      {
+        value: 18.7,
+        format: "percent",
+        label: l("crecimiento de seguidores · 30 días", "follower growth · 30 days"),
+      },
+      { value: 93.3, format: "percent", label: l("audiencia en Italia", "audience in Italy") },
+    ],
+    geo: {
+      title: l("Una puerta directa al mercado italiano.", "A direct door to the Italian market."),
+      text: l(
+        "El 93.3% de su audiencia está en Italia y el 93.9% habla italiano.",
+        "93.3% of his audience is in Italy and 93.9% speaks Italian.",
+      ),
+    },
+    pitch: {
+      title: l("Alcance viral en Italia.", "Viral reach in Italy."),
+      text: l(
+        "Goddermann le habla a una comunidad italiana, masculina y adulta. Con menos de 50K seguidores alcanzó 11.6M de visualizaciones en 30 días, 11M solo en Reels.",
+        "Goddermann speaks to an Italian, male, adult community. With under 50K followers he reached 11.6M views in 30 days, 11M from Reels alone.",
+      ),
+      strengths: [
+        {
+          k: l("Atención", "Attention"),
+          v: "11.6M",
+          d: l("visualizaciones en Instagram · 30 días", "Instagram views · 30 days"),
+        },
+        {
+          k: l("Crecimiento", "Growth"),
+          v: "+18.7%",
+          d: l("seguidores en el último mes", "followers in the last month"),
+        },
+        {
+          k: l("Mercado", "Market"),
+          v: "93.3%",
+          d: l("de la audiencia en Italia", "of the audience in Italy"),
+        },
+      ],
     },
     groups: [
       {
@@ -627,6 +871,48 @@ export const TALENTS: Talent[] = [
       },
     ],
     headline: { value: 52812, label: l("seguidores totales", "total followers") },
+    // Monthly views ≈ Instagram 4,452,764 (30 days) + TikTok 3.7M (28 days).
+    keyStats: { followers: 52812, monthlyViews: 8152764, viewsApprox: true },
+    highlights: [
+      { value: 52812, label: l("seguidores totales", "total followers") },
+      {
+        value: "4.45M",
+        label: l("reproducciones Instagram · 30 días", "Instagram plays · 30 days"),
+      },
+      { value: "3.7M", label: l("visualizaciones TikTok · 28 días", "TikTok views · 28 days") },
+      {
+        value: 96.6,
+        format: "percent",
+        label: l("alcance en no seguidores (Instagram)", "reach among non-followers (Instagram)"),
+      },
+    ],
+    geo: {
+      title: l("Una comunidad hispanohablante.", "A Spanish-speaking community."),
+      text: l(
+        "El 98.6% de su audiencia habla español y la mitad está en Argentina; también lo siguen desde México, Chile, España y Colombia.",
+        "98.6% of his audience speaks Spanish and half is in Argentina; he's also followed from Mexico, Chile, Spain and Colombia.",
+      ),
+    },
+    pitch: {
+      title: l("Alcance más allá de sus seguidores.", "Reach beyond his followers."),
+      text: l(
+        "Lowkey Santo crea contenido en Instagram y TikTok para una comunidad de 52.812 seguidores. En Instagram, el 96.6% del alcance llega a personas que todavía no lo siguen.",
+        "Lowkey Santo creates content on Instagram and TikTok for a community of 52,812 followers. On Instagram, 96.6% of his reach goes to people who don't follow him yet.",
+      ),
+      strengths: [
+        { k: l("Comunidad", "Community"), v: 52812, d: l("seguidores totales", "total followers") },
+        {
+          k: l("Atención", "Attention"),
+          v: "4.45M",
+          d: l("reproducciones en Instagram · 30 días", "Instagram plays · 30 days"),
+        },
+        {
+          k: l("Alcance", "Reach"),
+          v: "96.6%",
+          d: l("en no seguidores (Instagram)", "among non-followers (Instagram)"),
+        },
+      ],
+    },
     groups: [
       {
         title: l("Comunidad", "Community"),

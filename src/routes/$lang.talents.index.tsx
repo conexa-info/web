@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { TalentAccordion } from "@/components/site/TalentAccordion";
+import { TalentGrid } from "@/components/site/TalentCard";
 import { Section } from "@/components/site/ui";
 import { TALENTS } from "@/data/talents";
 import { pageHead, useLang, useT } from "@/lib/i18n";
@@ -27,7 +27,7 @@ function Talents() {
       <p className="mt-6 max-w-xl font-serif text-2xl italic text-muted-foreground">{t.body}</p>
       <p className="mt-4 max-w-xl text-lg text-primary">{t.international}</p>
       <div className="mt-10">
-        <TalentAccordion talents={TALENTS} lang={lang} />
+        <TalentGrid talents={TALENTS} lang={lang} />
       </div>
     </Section>
   );

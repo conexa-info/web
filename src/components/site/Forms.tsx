@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { TALENTS } from "@/data/talents";
 import { mailtoLink, whatsappLink } from "@/data/site";
 import { DICT, type Lang } from "@/lib/i18n";
+import { trackLead } from "@/lib/analytics";
+import { notifyLead } from "@/lib/notify-lead";
 import { btn } from "./ui";
 
 type Errs = Record<string, string>;
@@ -53,7 +55,49 @@ function Field({
 
 const req = (max: number) => z.string().trim().min(1, "required").max(max, "long");
 const opt = (max: number) => z.string().trim().max(max, "long").optional().or(z.literal(""));
-const optUrl = z.string().trim().max(300, "long").url("url").optional().or(z.literal(""));
+// Accepts links pasted without protocol (e.g. "tiktok.com/@user") by prefixing https://.
+const withProtocol = (v: unknown) => {
+  if (typeof v !== "string") return v;
+  const t = v.trim();
+  return t && !/^https?:\/\//i.test(t) ? `https://${t}` : t;
+};
+const optUrl = z.preprocess(
+  withProtocol,
+  z.string().max(300, "long").url("url").optional().or(z.literal("")),
+);
+
+// Phone numbers: digits with optional leading "+" and common separators, 8–15 digits.
+const PHONE_SEPARATORS = /[\s().-]/g;
+const isPhone = (v: string) => /^\+?\d{8,15}$/.test(v.replace(PHONE_SEPARATORS, ""));
+const reqPhone = req(40).refine(isPhone, "phone");
+const optPhone = opt(40).refine((v) => !v || isPhone(v), "phone");
+
+// Spam trap: bots fill the hidden field or submit within seconds of loading the form.
+const HONEYPOT = "nickname";
+const MIN_FILL_MS = 3000;
+const looksLikeBot = (data: Record<string, string>, startedAt: number) =>
+  !!data[HONEYPOT] || Date.now() - startedAt < MIN_FILL_MS;
+
+function Honeypot() {
+  return (
+    <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
+      <label>
+        Nickname
+        <input type="text" name={HONEYPOT} tabIndex={-1} autoComplete="off" />
+      </label>
+    </div>
+  );
+}
+
+/** Analytics + team email after a successful insert. Never blocks or fails the submission. */
+function afterLead(kind: "brand" | "creator", lang: Lang, fields: Record<string, unknown>) {
+  trackLead(kind, lang);
+  const flat: Record<string, string> = {};
+  for (const [k, v] of Object.entries(fields))
+    if (v !== undefined && v !== null && v !== "")
+      flat[k] = (Array.isArray(v) ? v.join(", ") : String(v)).slice(0, 2000);
+  notifyLead({ data: { kind, fields: flat } }).catch(() => {});
+}
 
 function mapErrors(err: z.ZodError, lang: Lang): Errs {
   const out: Errs = {};
@@ -158,16 +202,10 @@ const brandSchema = z.object({
   full_name: req(120).pipe(z.string().min(2, "required")),
   company: req(160),
   email: z.string().trim().min(1, "required").max(255, "long").email("email"),
-  whatsapp: opt(40),
+  whatsapp: reqPhone,
   website: opt(300),
-  campaign_type: req(60),
   talent: req(60),
-  product: req(500),
-  objective: req(1000),
   market: req(160),
-  budget: opt(120),
-  campaign_date: opt(60),
-  message: opt(2000),
   consent: z.literal(true, { errorMap: () => ({ message: "consent" }) }),
 });
 
@@ -183,6 +221,7 @@ export function BrandForm({
   const [errs, setErrs] = useState<Errs>({});
   const [state, setState] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [consent, setConsent] = useState(false);
+  const [startedAt] = useState(() => Date.now());
   const talentNames = TALENTS.map((t) => t.name);
   const preset = TALENTS.find((t) => t.slug === defaultTalent)?.name ?? "";
 
@@ -196,17 +235,22 @@ export function BrandForm({
       return;
     }
     setErrs({});
+    if (looksLikeBot(data, startedAt)) {
+      setState("success");
+      return;
+    }
     setState("sending");
     const v = parsed.data;
     const { error } = await supabase.from("brand_inquiries").insert({
       ...v,
-      whatsapp: v.whatsapp || null,
       website: v.website || null,
-      budget: v.budget || null,
-      campaign_date: v.campaign_date || null,
-      message: v.message || null,
+      // Columns that are NOT NULL in the table but no longer asked in the short form.
+      campaign_type: "",
+      product: "",
+      objective: "",
       locale: lang,
     });
+    if (!error) afterLead("brand", lang, { ...v, locale: lang });
     setState(error ? "error" : "success");
   }
 
@@ -230,7 +274,7 @@ export function BrandForm({
     <form
       onSubmit={onSubmit}
       noValidate
-      className="space-y-5 rounded-3xl border bg-card p-6 shadow-card md:p-10"
+      className="relative space-y-5 rounded-3xl border bg-card p-6 shadow-card md:p-10"
     >
       <div>
         <h2 className="text-3xl font-bold">{b.title}</h2>
@@ -251,26 +295,11 @@ export function BrandForm({
         <Field lang={lang} id="b-email" label={b.email} error={errs["email"]}>
           <input {...p("email")} type="email" autoComplete="email" />
         </Field>
-        <Field lang={lang} id="b-whatsapp" label={b.whatsapp} optional error={errs["whatsapp"]}>
-          <input {...p("whatsapp")} type="tel" autoComplete="tel" />
+        <Field lang={lang} id="b-whatsapp" label={b.whatsapp} error={errs["whatsapp"]}>
+          <input {...p("whatsapp")} type="tel" autoComplete="tel" placeholder="+54 9 11 …" />
         </Field>
         <Field lang={lang} id="b-website" label={b.website} optional error={errs["website"]}>
           <input {...p("website")} />
-        </Field>
-        <Field
-          lang={lang}
-          id="b-campaign_type"
-          label={b.campaignType}
-          error={errs["campaign_type"]}
-        >
-          <select {...p("campaign_type")} defaultValue="">
-            <option value="" disabled>
-              {f.select}
-            </option>
-            {b.campaignTypes.map((o) => (
-              <option key={o}>{o}</option>
-            ))}
-          </select>
         </Field>
         <Field lang={lang} id="b-talent" label={b.talent} error={errs["talent"]}>
           <select {...p("talent")} defaultValue={preset}>
@@ -286,29 +315,7 @@ export function BrandForm({
           <input {...p("market")} />
         </Field>
       </div>
-      <Field lang={lang} id="b-product" label={b.product} error={errs["product"]}>
-        <input {...p("product")} />
-      </Field>
-      <Field lang={lang} id="b-objective" label={b.objective} error={errs["objective"]}>
-        <textarea {...p("objective")} rows={3} />
-      </Field>
-      <div className="grid gap-5 md:grid-cols-2">
-        <Field lang={lang} id="b-budget" label={b.budget} optional error={errs["budget"]}>
-          <input {...p("budget")} />
-        </Field>
-        <Field
-          lang={lang}
-          id="b-campaign_date"
-          label={b.date}
-          optional
-          error={errs["campaign_date"]}
-        >
-          <input {...p("campaign_date")} type="month" />
-        </Field>
-      </div>
-      <Field lang={lang} id="b-message" label={b.message} optional error={errs["message"]}>
-        <textarea {...p("message")} rows={3} />
-      </Field>
+      <Honeypot />
       <Consent lang={lang} checked={consent} onChange={setConsent} error={errs["consent"]} />
       {state === "error" && <Status state="error" lang={lang} waMsg={DICT[lang].contact.waBrand} />}
       <button type="submit" disabled={state === "sending"} className={btn({ size: "lg" })}>
@@ -324,31 +331,24 @@ export function BrandForm({
   );
 }
 
-const creatorSchema = z
-  .object({
-    full_name: req(120).pipe(z.string().min(2, "required")),
-    artistic_name: req(120),
-    is_adult: z.literal(true, { errorMap: () => ({ message: "adult" }) }),
-    country: req(80),
-    city: opt(80),
-    email: z.string().trim().min(1, "required").max(255, "long").email("email"),
-    whatsapp: opt(40),
-    instagram_user: opt(80),
-    instagram_url: optUrl,
-    tiktok_user: opt(80),
-    tiktok_url: optUrl,
-    other_url: optUrl,
-    followers: req(60),
-    categories: z.array(z.string()).min(1, "categories"),
-    description: req(2000),
-    featured_url: z.string().trim().min(1, "required").max(300, "long").url("url"),
-    extra: opt(2000),
-    consent: z.literal(true, { errorMap: () => ({ message: "consent" }) }),
-  })
-  .refine((d) => !!(d.instagram_user || d.tiktok_user), {
-    path: ["instagram_user"],
-    message: "social",
-  });
+const creatorSchema = z.object({
+  full_name: req(120).pipe(z.string().min(2, "required")),
+  artistic_name: req(120),
+  is_adult: z.literal(true, { errorMap: () => ({ message: "adult" }) }),
+  country: req(80),
+  city: opt(80),
+  email: z.string().trim().min(1, "required").max(255, "long").email("email"),
+  whatsapp: reqPhone,
+  instagram_user: req(80),
+  tiktok_user: opt(80),
+  other_url: optUrl,
+  followers: req(60),
+  categories: z.array(z.string()).min(1, "categories"),
+  description: req(2000),
+  featured_url: optUrl,
+  extra: opt(2000),
+  consent: z.literal(true, { errorMap: () => ({ message: "consent" }) }),
+});
 
 export function CreatorForm({ lang }: { lang: Lang }) {
   const f = DICT[lang].form;
@@ -358,6 +358,7 @@ export function CreatorForm({ lang }: { lang: Lang }) {
   const [consent, setConsent] = useState(false);
   const [adult, setAdult] = useState(false);
   const [cats, setCats] = useState<string[]>([]);
+  const [startedAt] = useState(() => Date.now());
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -365,28 +366,28 @@ export function CreatorForm({ lang }: { lang: Lang }) {
     const data = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
     const parsed = creatorSchema.safeParse({ ...data, categories: cats, consent, is_adult: adult });
     if (!parsed.success) {
-      const m = mapErrors(parsed.error, lang);
-      if (parsed.error.issues.some((i) => i.message === "social"))
-        m["instagram_user"] = c.atLeastOne;
-      setErrs(m);
+      setErrs(mapErrors(parsed.error, lang));
       return;
     }
     setErrs({});
+    if (looksLikeBot(data, startedAt)) {
+      setState("success");
+      return;
+    }
     setState("sending");
     const v = parsed.data;
     const nul = (s?: string) => s || null;
     const { error } = await supabase.from("creator_applications").insert({
       ...v,
       city: nul(v.city),
-      whatsapp: nul(v.whatsapp),
-      instagram_user: nul(v.instagram_user),
-      instagram_url: nul(v.instagram_url),
       tiktok_user: nul(v.tiktok_user),
-      tiktok_url: nul(v.tiktok_url),
       other_url: nul(v.other_url),
+      // featured_url is NOT NULL in the table, so an empty optional value is stored as "".
+      featured_url: v.featured_url ?? "",
       extra: nul(v.extra),
       locale: lang,
     });
+    if (!error) afterLead("creator", lang, { ...v, locale: lang });
     setState(error ? "error" : "success");
   }
 
@@ -410,7 +411,7 @@ export function CreatorForm({ lang }: { lang: Lang }) {
     <form
       onSubmit={onSubmit}
       noValidate
-      className="space-y-5 rounded-3xl border bg-card p-6 shadow-card md:p-10"
+      className="relative space-y-5 rounded-3xl border bg-card p-6 shadow-card md:p-10"
     >
       <div>
         <h2 className="text-3xl font-bold">{c.title}</h2>
@@ -442,38 +443,27 @@ export function CreatorForm({ lang }: { lang: Lang }) {
         <Field lang={lang} id="c-email" label={c.email} error={errs["email"]}>
           <input {...p("email")} type="email" autoComplete="email" />
         </Field>
-        <Field lang={lang} id="c-whatsapp" label={c.whatsapp} optional error={errs["whatsapp"]}>
-          <input {...p("whatsapp")} type="tel" />
+        <Field lang={lang} id="c-whatsapp" label={c.whatsapp} error={errs["whatsapp"]}>
+          <input {...p("whatsapp")} type="tel" autoComplete="tel" placeholder="+54 9 11 …" />
         </Field>
-        <Field
-          lang={lang}
-          id="c-instagram_user"
-          label={c.igUser}
-          optional
-          error={errs["instagram_user"]}
-        >
+        <Field lang={lang} id="c-instagram_user" label={c.igUser} error={errs["instagram_user"]}>
           <input {...p("instagram_user")} placeholder="@" />
-        </Field>
-        <Field
-          lang={lang}
-          id="c-instagram_url"
-          label={c.igUrl}
-          optional
-          error={errs["instagram_url"]}
-        >
-          <input {...p("instagram_url")} type="url" placeholder="https://instagram.com/…" />
         </Field>
         <Field lang={lang} id="c-tiktok_user" label={c.ttUser} optional error={errs["tiktok_user"]}>
           <input {...p("tiktok_user")} placeholder="@" />
-        </Field>
-        <Field lang={lang} id="c-tiktok_url" label={c.ttUrl} optional error={errs["tiktok_url"]}>
-          <input {...p("tiktok_url")} type="url" placeholder="https://tiktok.com/@…" />
         </Field>
         <Field lang={lang} id="c-other_url" label={c.otherUrl} optional error={errs["other_url"]}>
           <input {...p("other_url")} type="url" />
         </Field>
         <Field lang={lang} id="c-followers" label={c.followers} error={errs["followers"]}>
-          <input {...p("followers")} placeholder="50.000" />
+          <select {...p("followers")} defaultValue="">
+            <option value="" disabled>
+              {f.select}
+            </option>
+            {c.followerRanges.map((o) => (
+              <option key={o}>{o}</option>
+            ))}
+          </select>
         </Field>
       </div>
       <fieldset>
@@ -512,7 +502,13 @@ export function CreatorForm({ lang }: { lang: Lang }) {
       <Field lang={lang} id="c-description" label={c.description} error={errs["description"]}>
         <textarea {...p("description")} rows={3} />
       </Field>
-      <Field lang={lang} id="c-featured_url" label={c.featured} error={errs["featured_url"]}>
+      <Field
+        lang={lang}
+        id="c-featured_url"
+        label={c.featured}
+        optional
+        error={errs["featured_url"]}
+      >
         <input {...p("featured_url")} type="url" placeholder="https://" />
       </Field>
       <Field lang={lang} id="c-extra" label={c.extra} optional error={errs["extra"]}>
@@ -535,6 +531,7 @@ export function CreatorForm({ lang }: { lang: Lang }) {
           </p>
         )}
       </div>
+      <Honeypot />
       <Consent lang={lang} checked={consent} onChange={setConsent} error={errs["consent"]} />
       {state === "error" && (
         <Status state="error" lang={lang} waMsg={DICT[lang].contact.waCreator} />

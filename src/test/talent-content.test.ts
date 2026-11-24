@@ -22,3 +22,31 @@ describe("Creator data boundaries", () => {
     ]);
   });
 });
+
+describe("Talent cards and FAQ", () => {
+  it("gives every talent the followers and monthly views shown on cards", async () => {
+    const { TALENTS } = await import("@/data/talents");
+    for (const t of TALENTS) {
+      expect(t.keyStats.followers, t.slug).toBeGreaterThan(0);
+      expect(t.keyStats.monthlyViews, t.slug).toBeGreaterThan(0);
+    }
+  });
+
+  it("formats compact numbers per locale", async () => {
+    const { formatCompact } = await import("@/lib/metric-format");
+    expect(formatCompact(1590000, "es")).toBe("1,6M");
+    expect(formatCompact(1590000, "en")).toBe("1.6M");
+    expect(formatCompact(460000, "es")).toBe("460K");
+    expect(formatCompact(34900000, "en")).toBe("34.9M");
+  });
+
+  it("publishes the FAQ with contact data from site.ts", async () => {
+    const { faqJsonLd } = await import("@/components/site/Faq");
+    const { CONTACT } = await import("@/data/site");
+    const ld = faqJsonLd("es");
+    const last = ld.mainEntity.at(-1)!;
+    expect(ld.mainEntity).toHaveLength(11);
+    expect(last.acceptedAnswer.text).toContain(CONTACT.email);
+    expect(last.acceptedAnswer.text).toContain("@agencyconexa");
+  });
+});
