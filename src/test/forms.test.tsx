@@ -1,14 +1,9 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const { insert, notifyLead } = vi.hoisted(() => ({
-  insert: vi.fn(),
-  notifyLead: vi.fn(() => Promise.resolve({ sent: true })),
-}));
-vi.mock("@/integrations/supabase/client", () => ({
-  supabase: { from: () => ({ insert }) },
-}));
-vi.mock("@/lib/notify-lead", () => ({ notifyLead }));
+const { submitLead } = vi.hoisted(() => ({ submitLead: vi.fn() }));
+vi.mock("@/lib/submit-lead", () => ({ submitLead }));
+const sent = () => submitLead.mock.calls[0]![0].data.fields;
 
 import { CreatorForm } from "@/components/site/Forms";
 import { DICT } from "@/lib/i18n";
@@ -34,8 +29,7 @@ function fillRequired() {
 describe("CreatorForm", () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ["Date"] });
-    insert.mockReset().mockResolvedValue({ error: null });
-    notifyLead.mockClear();
+    submitLead.mockReset().mockResolvedValue({ ok: true });
   });
   afterEach(() => vi.useRealTimers());
 
@@ -53,7 +47,7 @@ describe("CreatorForm", () => {
     );
     expect(document.getElementById("c-instagram_user-err")).toBeInTheDocument();
     expect(document.getElementById("c-featured_url-err")).toBeNull();
-    expect(insert).not.toHaveBeenCalled();
+    expect(submitLead).not.toHaveBeenCalled();
   });
 
   it("rejects a WhatsApp number that is not a phone", () => {
@@ -63,16 +57,17 @@ describe("CreatorForm", () => {
     expect(document.getElementById("c-whatsapp-err")).toHaveTextContent(DICT.es.form.errors.phone);
   });
 
-  it("submits without featured link and shows success only after the insert", async () => {
+  it("submits without featured link and shows success only after delivery", async () => {
     render(<CreatorForm lang="es" />);
     fillRequired();
     vi.setSystemTime(Date.now() + 10_000);
     fireEvent.submit(document.querySelector("form")!);
     await waitFor(() => expect(screen.getByText(c.successTitle)).toBeInTheDocument());
-    expect(insert).toHaveBeenCalledWith(
-      expect.objectContaining({ featured_url: "", instagram_user: "@anita", locale: "es" }),
-    );
-    expect(notifyLead).toHaveBeenCalledOnce();
+    expect(submitLead).toHaveBeenCalledOnce();
+    expect(submitLead.mock.calls[0]![0].data.kind).toBe("creator");
+    expect(sent()).toMatchObject({ instagram_user: "@anita", locale: "es" });
+    expect(sent()).not.toHaveProperty("featured_url");
+    expect(sent()).not.toHaveProperty("consent");
   });
 
   it("adds https:// to a featured link pasted without it", async () => {
@@ -81,18 +76,27 @@ describe("CreatorForm", () => {
     set("featured_url", "tiktok.com/@anita/video/1");
     vi.setSystemTime(Date.now() + 10_000);
     fireEvent.submit(document.querySelector("form")!);
-    await waitFor(() => expect(insert).toHaveBeenCalled());
-    expect(insert.mock.calls[0]![0].featured_url).toBe("https://tiktok.com/@anita/video/1");
+    await waitFor(() => expect(submitLead).toHaveBeenCalled());
+    expect(sent().featured_url).toBe("https://tiktok.com/@anita/video/1");
   });
 
-  it("shows the error state when the insert fails", async () => {
-    insert.mockResolvedValue({ error: { message: "boom" } });
+  it("shows the error state when delivery fails", async () => {
+    submitLead.mockResolvedValue({ ok: false });
     render(<CreatorForm lang="es" />);
     fillRequired();
     vi.setSystemTime(Date.now() + 10_000);
     fireEvent.submit(document.querySelector("form")!);
     await waitFor(() => expect(screen.getByText(DICT.es.form.errorTitle)).toBeInTheDocument());
-    expect(notifyLead).not.toHaveBeenCalled();
+  });
+
+  it("shows the error state instead of spinning when the request throws", async () => {
+    submitLead.mockRejectedValue(new Error("network"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    render(<CreatorForm lang="es" />);
+    fillRequired();
+    vi.setSystemTime(Date.now() + 10_000);
+    fireEvent.submit(document.querySelector("form")!);
+    await waitFor(() => expect(screen.getByText(DICT.es.form.errorTitle)).toBeInTheDocument());
   });
 
   it("silently drops submissions that fill the spam trap", async () => {
@@ -104,6 +108,6 @@ describe("CreatorForm", () => {
     vi.setSystemTime(Date.now() + 10_000);
     fireEvent.submit(document.querySelector("form")!);
     await waitFor(() => expect(screen.getByText(c.successTitle)).toBeInTheDocument());
-    expect(insert).not.toHaveBeenCalled();
+    expect(submitLead).not.toHaveBeenCalled();
   });
 });

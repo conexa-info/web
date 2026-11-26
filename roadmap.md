@@ -16,7 +16,8 @@
 - [x] Formularios: trampa anti-spam, WhatsApp con formato válido, seguidores por rango, evento `generate_lead` en Analytics y aviso por email al equipo.
 - [x] Google Analytics solo con consentimiento (banner + "Preferencias de cookies" en el pie).
 - [x] Imágenes comprimidas (~50% menos) y limpieza de componentes/dependencias sin uso.
-- [ ] Activar el aviso por email: cargar el secreto `RESEND_API_KEY` (y opcional `LEADS_NOTIFY_TO` / `LEADS_NOTIFY_FROM` con dominio verificado en Resend).
+- [x] Formularios sin base de datos: cada envío llega por mail (Resend) y se agrega a una Google Sheet; Supabase/Lovable Cloud eliminado de los formularios.
+- [ ] Configurar en Vercel `SHEETS_WEBHOOK_URL` y `SHEETS_WEBHOOK_SECRET` (ver `scripts/google-sheets-webhook.gs`) y verificar el dominio de `RESEND_FROM` en Resend.
 - [ ] Sumar casos de éxito o logos de marcas (requiere datos reales de Conexa).
 - [x] Home: talentos primero en cards (3 col / 2 en celu) con seguidores y vistas por mes; fotos a color con efectos de scroll; hero con cifras totales.
 - [x] Perfiles: plantilla única basada en Lua (bloques según datos de cada talento) y datos estructurados por creador.

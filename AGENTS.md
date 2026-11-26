@@ -18,4 +18,4 @@
 - Featured videos and supporting public sources belong to each talent record; the shared gallery loads third-party players only on play and always offers the original post, keeping all profiles consistent without automatic third-party requests.
 - Store new exact metrics as numbers with optional percentage format, and audience provenance/precision in talent data; locale formatting belongs in display helpers so bilingual views retain the same values.
 - Contact data (email, WhatsApp, LinkedIn) lives only in `src/data/site.ts` so links stay consistent.
-- Form submissions insert into insert-only tables (`brand_inquiries`, `creator_applications`); success is shown only after the insert succeeds.
+- Form submissions go through the `submitLead` server function (`src/lib/submit-lead.ts`), which emails the team via Resend and appends a row to a Google Sheet (`scripts/google-sheets-webhook.gs`); there is no database. Success is shown only after at least one channel accepted the lead.

@@ -1,12 +1,11 @@
 import { useState, type ReactNode } from "react";
 import { z } from "zod";
 import { CheckCircle2, Loader2, MessageCircle, Mail } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { TALENTS } from "@/data/talents";
 import { mailtoLink, whatsappLink } from "@/data/site";
 import { DICT, type Lang } from "@/lib/i18n";
 import { trackLead } from "@/lib/analytics";
-import { notifyLead } from "@/lib/notify-lead";
+import { submitLead } from "@/lib/submit-lead";
 import { btn } from "./ui";
 
 type Errs = Record<string, string>;
@@ -89,14 +88,33 @@ function Honeypot() {
   );
 }
 
-/** Analytics + team email after a successful insert. Never blocks or fails the submission. */
-function afterLead(kind: "brand" | "creator", lang: Lang, fields: Record<string, unknown>) {
-  trackLead(kind, lang);
+// Sends the lead to the server (email + Google Sheet). It must always settle: a thrown
+// error or a server that never answers would otherwise leave the button spinning.
+const SUBMIT_TIMEOUT_MS = 20000;
+async function deliverLead(
+  kind: "brand" | "creator",
+  lang: Lang,
+  fields: Record<string, unknown>,
+): Promise<boolean> {
   const flat: Record<string, string> = {};
   for (const [k, v] of Object.entries(fields))
     if (v !== undefined && v !== null && v !== "")
       flat[k] = (Array.isArray(v) ? v.join(", ") : String(v)).slice(0, 2000);
-  notifyLead({ data: { kind, fields: flat } }).catch(() => {});
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const timeout = new Promise<{ ok: false }>((resolve) => {
+      timer = setTimeout(() => resolve({ ok: false }), SUBMIT_TIMEOUT_MS);
+    });
+    const res = await Promise.race([submitLead({ data: { kind, fields: flat } }), timeout]);
+    if (res.ok) trackLead(kind, lang);
+    else console.error("[form] lead not delivered", res);
+    return res.ok;
+  } catch (err) {
+    console.error("[form] submit threw", err);
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function mapErrors(err: z.ZodError, lang: Lang): Errs {
@@ -241,17 +259,8 @@ export function BrandForm({
     }
     setState("sending");
     const v = parsed.data;
-    const { error } = await supabase.from("brand_inquiries").insert({
-      ...v,
-      website: v.website || null,
-      // Columns that are NOT NULL in the table but no longer asked in the short form.
-      campaign_type: "",
-      product: "",
-      objective: "",
-      locale: lang,
-    });
-    if (!error) afterLead("brand", lang, { ...v, locale: lang });
-    setState(error ? "error" : "success");
+    const ok = await deliverLead("brand", lang, { ...v, consent: undefined, locale: lang });
+    setState(ok ? "success" : "error");
   }
 
   if (state === "success")
@@ -376,19 +385,13 @@ export function CreatorForm({ lang }: { lang: Lang }) {
     }
     setState("sending");
     const v = parsed.data;
-    const nul = (s?: string) => s || null;
-    const { error } = await supabase.from("creator_applications").insert({
+    const ok = await deliverLead("creator", lang, {
       ...v,
-      city: nul(v.city),
-      tiktok_user: nul(v.tiktok_user),
-      other_url: nul(v.other_url),
-      // featured_url is NOT NULL in the table, so an empty optional value is stored as "".
-      featured_url: v.featured_url ?? "",
-      extra: nul(v.extra),
+      consent: undefined,
+      is_adult: undefined,
       locale: lang,
     });
-    if (!error) afterLead("creator", lang, { ...v, locale: lang });
-    setState(error ? "error" : "success");
+    setState(ok ? "success" : "error");
   }
 
   if (state === "success")

@@ -1,11 +1,8 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const { insert } = vi.hoisted(() => ({ insert: vi.fn() }));
-vi.mock("@/integrations/supabase/client", () => ({
-  supabase: { from: () => ({ insert }) },
-}));
-vi.mock("@/lib/notify-lead", () => ({ notifyLead: vi.fn(() => Promise.resolve({ sent: true })) }));
+const { submitLead } = vi.hoisted(() => ({ submitLead: vi.fn() }));
+vi.mock("@/lib/submit-lead", () => ({ submitLead }));
 
 import { BrandForm } from "@/components/site/Forms";
 import { DICT } from "@/lib/i18n";
@@ -16,7 +13,7 @@ const set = (id: string, value: string) =>
 describe("BrandForm", () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ["Date"] });
-    insert.mockReset().mockResolvedValue({ error: null });
+    submitLead.mockReset().mockResolvedValue({ ok: true });
   });
   afterEach(() => vi.useRealTimers());
 
@@ -44,7 +41,7 @@ describe("BrandForm", () => {
     );
   });
 
-  it("fills the removed NOT NULL columns with empty text", async () => {
+  it("sends the brand lead with the preset talent", async () => {
     render(<BrandForm lang="es" defaultTalent="spiky" />);
     set("full_name", "Ana Pérez");
     set("company", "Marca");
@@ -54,12 +51,11 @@ describe("BrandForm", () => {
     fireEvent.click(screen.getByRole("checkbox"));
     vi.setSystemTime(Date.now() + 10_000);
     fireEvent.submit(document.querySelector("form")!);
-    await waitFor(() => expect(insert).toHaveBeenCalled());
-    expect(insert.mock.calls[0]![0]).toMatchObject({
-      talent: "Spiky",
-      campaign_type: "",
-      product: "",
-      objective: "",
-    });
+    await waitFor(() =>
+      expect(screen.getByText(DICT.es.form.brand.successTitle)).toBeInTheDocument(),
+    );
+    const { kind, fields } = submitLead.mock.calls[0]![0].data;
+    expect(kind).toBe("brand");
+    expect(fields).toMatchObject({ talent: "Spiky", company: "Marca", locale: "es" });
   });
 });
